@@ -6,10 +6,12 @@
 // #######################################################################################################
 
 /**
+ * 2024-10-26 tonhuisman: Add setting for RX buffer size and optional Debug logging. Add Quit log to suppress most logging
+ *                        Store original received data names, to show in Device configuration, add default decimals to conversion factors
+ *                        Improved serial processing reading per line instead of per data-block, moved to 50/sec
  * 2024-10-22 tonhuisman: Add checksum handling,
  *                        Add conversion factors to get more usable values like V, A, Ah, %. Based on VE.Direct protocol manual v. 3.3
- * 2024-10-20 tonhuisman: Start plugin for Victron VE.Direct protocol reader
- *                        Using entity fields as documented here: https://github.com/KinDR007/VictronMPPT-ESPHOME
+ * 2024-10-20 tonhuisman: Start plugin for Victron VE.Direct protocol reader, based on Victron documentation
  **/
 
 # define PLUGIN_176
@@ -74,8 +76,11 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       CONFIG_PIN1          = rxPin;
       CONFIG_PIN2          = txPin;
       P176_SERIAL_BAUDRATE = P176_DEFAULT_BAUDRATE;
+      P176_SERIAL_BUFFER   = P176_DEFAULT_BUFFER;
       P176_RX_WAIT         = P176_DEFAULT_RX_WAIT;
+      P176_SET_FAIL_CHECKSUM(P176_DEFAULT_FAIL_CHECKSUM);
       P176_SET_LED_PIN(-1);
+      P176_SET_QUIET_LOG(true);
     }
 
     case PLUGIN_WEBFORM_SHOW_CONFIG:
@@ -110,6 +115,10 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
 
       addFormNumericBox(F("RX Receive Timeout"), F("prxwait"), P176_RX_WAIT, 0, 200);
       addUnit(F("mSec"));
+
+      addFormNumericBox(F("RX buffersize"), F("pbuffer"), P176_SERIAL_BUFFER, 128, 2048);
+      addUnit(F("128..2048"));
+
       # if P176_FAIL_CHECKSUM
       addFormCheckBox(F("Ignore data on checksum error"), F("pchksm"), P176_GET_FAIL_CHECKSUM);
       # endif // if P176_FAIL_CHECKSUM
@@ -130,6 +139,11 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
           P176_data->plugin_show_current_data();
         }
       }
+      # if P176_DEBUG
+      addFormSubHeader(F("Logging"));
+      addFormCheckBox(F("Enable logging (for debug)"),  F("pdebug"), P176_GET_DEBUG_LOG);
+      # endif // if P176_DEBUG
+      addFormCheckBox(F("Quiet logging (minimal log)"), F("pquiet"), P176_GET_QUIET_LOG);
       success = true;
       break;
     }
@@ -139,11 +153,16 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       P176_SERIAL_BAUDRATE = getFormItemInt(F("pbaud"));
       P176_SERIAL_CONFIG   = serialHelper_serialconfig_webformSave();
       P176_RX_WAIT         = getFormItemInt(F("prxwait"));
+      P176_SERIAL_BUFFER   = getFormItemInt(F("pbuffer"));
       P176_SET_LED_PIN(getFormItemInt(F("pledpin")));
       P176_SET_LED_INVERTED(isFormItemChecked(F("pledinv")));
       # if P176_FAIL_CHECKSUM
       P176_SET_FAIL_CHECKSUM(isFormItemChecked(F("pchksm")));
       # endif // if P176_FAIL_CHECKSUM
+      # if P176_DEBUG
+      P176_SET_DEBUG_LOG(isFormItemChecked(F("pdebug")));
+      # endif // if P176_DEBUG
+      P176_SET_QUIET_LOG(isFormItemChecked(F("pquiet")));
 
       success = true;
       break;
@@ -174,11 +193,11 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       break;
     }
 
-    case PLUGIN_TEN_PER_SECOND:
+    case PLUGIN_FIFTY_PER_SECOND:
     {
       P176_data_struct *P176_data = static_cast<P176_data_struct *>(getPluginTaskData(event->TaskIndex));
 
-      success = (nullptr != P176_data) && P176_data->plugin_ten_per_second(event);
+      success = (nullptr != P176_data) && P176_data->plugin_fifty_per_second(event);
 
       break;
     }

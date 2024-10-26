@@ -6,19 +6,22 @@
 
 # include <ESPeasySerial.h>
 
-# define P176_DEBUG 0           // Enable some extra (development) logging
+# define P176_DEBUG 1           // Enable some extra (development) logging
 
 # define P176_HANDLE_CHECKSUM 1 // Implement checksum?
 # define P176_FAIL_CHECKSUM   1 // Fail/ignore data on checksum errors (optional)?
 
 # define P176_SERIAL_CONFIG             PCONFIG(0)
-# define P176_SERIAL_BAUDRATE           PCONFIG(1)
+# define P176_SERIAL_BAUDRATE           PCONFIG_LONG(1)
 # define P176_RX_WAIT                   PCONFIG(2)
+# define P176_SERIAL_BUFFER             PCONFIG(3)
 
 # define P176_FLAGS                     PCONFIG_ULONG(0)
-# define P176_FLAG_LED_PIN              0 // 8 bit
-# define P176_FLAG_LED_INVERTED         8 // 1 bit
-# define P176_FLAG_FAIL_CHECKSUM        9 // 1 bit
+# define P176_FLAG_LED_PIN              0  // 8 bit
+# define P176_FLAG_LED_INVERTED         8  // 1 bit
+# define P176_FLAG_FAIL_CHECKSUM        9  // 1 bit
+# define P176_FLAG_DEBUG_LOG            10 // 1 bit
+# define P176_FLAG_LOG_QUIET            11 // 1 bit
 # define P176_GET_LED_PIN    get8BitFromUL(P176_FLAGS, P176_FLAG_LED_PIN)
 # define P176_SET_LED_PIN(N) set8BitToUL(P176_FLAGS, P176_FLAG_LED_PIN, N)
 # define P176_GET_LED_INVERTED    bitRead(P176_FLAGS, P176_FLAG_LED_INVERTED)
@@ -27,9 +30,17 @@
 #  define P176_GET_FAIL_CHECKSUM    bitRead(P176_FLAGS, P176_FLAG_FAIL_CHECKSUM)
 #  define P176_SET_FAIL_CHECKSUM(N) bitWrite(P176_FLAGS, P176_FLAG_FAIL_CHECKSUM, N)
 # endif // if P176_FAIL_CHECKSUM
+# if P176_DEBUG
+#  define P176_GET_DEBUG_LOG    bitRead(P176_FLAGS, P176_FLAG_DEBUG_LOG)
+#  define P176_SET_DEBUG_LOG(N) bitWrite(P176_FLAGS, P176_FLAG_DEBUG_LOG, N)
+# endif // if P176_DEBUG
+# define P176_GET_QUIET_LOG    bitRead(P176_FLAGS, P176_FLAG_LOG_QUIET)
+# define P176_SET_QUIET_LOG(N) bitWrite(P176_FLAGS, P176_FLAG_LOG_QUIET, N)
 
 # define P176_DEFAULT_BAUDRATE          19200
-# define P176_DEFAULT_RX_WAIT           10
+# define P176_DEFAULT_BUFFER            128
+# define P176_DEFAULT_RX_WAIT           5
+# define P176_DEFAULT_FAIL_CHECKSUM     true
 
 struct P176_data_struct : public PluginTaskData_base {
 public:
@@ -42,20 +53,21 @@ public:
   bool   init();
 
   bool   plugin_read(struct EventStruct *event);
-  bool   plugin_ten_per_second(struct EventStruct *event);
+  bool   plugin_fifty_per_second(struct EventStruct *event);
   bool   plugin_get_config_value(struct EventStruct *event,
                                  String            & string);
-  size_t plugin_size_current_data();
-  bool   plugin_show_current_data();
+  size_t plugin_size_current_data() const;
+  bool   plugin_show_current_data() const;
   bool   isInitialized() const {
     return nullptr != _serial;
   }
 
 private:
 
-  float getKeyFactor(const String& key) const;
+  float getKeyFactor(const String& key,
+                     int32_t     & nrDecimals) const;
   bool  getReceivedValue(const String& key,
-                         String      & value);
+                         String      & value) const;
   void  handleSerial();
   void  processBuffer(const String& message);
   # if P176_FAIL_CHECKSUM
@@ -64,17 +76,22 @@ private:
 
   ESPeasySerial *_serial = nullptr;
 
-  int8_t            _ledPin         = -1;
-  bool              _ledInverted    = false;
-  ESPEasySerialPort _port           = ESPEasySerialPort::not_set;
-  uint8_t           _config         = 0;
-  int8_t            _rxPin          = -1;
-  int8_t            _txPin          = -1;
-  int               _baud           = P176_DEFAULT_BAUDRATE;
   int               _rxWait         = 0;
+  int               _baud           = P176_DEFAULT_BAUDRATE;
   uint32_t          _checksumErrors = 0;
+  unsigned int      _serialBuffer   = P176_DEFAULT_BUFFER;
+  String            _dataLine;
+  int8_t            _ledPin      = -1;
+  bool              _ledInverted = false;
+  ESPEasySerialPort _port        = ESPEasySerialPort::not_set;
+  uint8_t           _config      = 0;
+  int8_t            _rxPin       = -1;
+  int8_t            _txPin       = -1;
+  # if P176_DEBUG
+  bool _debugLog = false;
+  # endif // if P176_DEBUG
+  bool _logQuiet = false;
 
-  // String            _buffer;
   # if P176_HANDLE_CHECKSUM
   enum class Checksum_state_e: uint8_t {
     Undefined = 0,
@@ -85,13 +102,13 @@ private:
     Error,
   };
   Checksum_state_e _checksumState = Checksum_state_e::Undefined;
-  uint16_t         _checksum      = 0;
+  uint8_t          _checksum      = 0;
   bool             _failChecksum  = false;
   # endif // if P176_HANDLE_CHECKSUM
 
   // Key is stored in lower-case as PLUGIN_GET_CONFIG_VALUE passes in the variable name in lower-case
-  // FIXME
-  std::map<String, String>_data{}; // = { { "i", "Data I" }, { "error", "No error detected" }, { "v", "25.75" } };
+  std::map<String, String>_data{};
+  std::map<String, String>_names{};
   # if P176_FAIL_CHECKSUM
   std::map<String, String>_temp{};
   # endif // if P176_FAIL_CHECKSUM

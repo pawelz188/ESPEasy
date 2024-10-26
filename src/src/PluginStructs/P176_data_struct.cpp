@@ -8,28 +8,32 @@
 * Constructor
 **************************************************************************/
 P176_data_struct::P176_data_struct(struct EventStruct *event) {
-  _port        = static_cast<ESPEasySerialPort>(CONFIG_PORT);
-  _baud        = P176_SERIAL_BAUDRATE;
-  _config      = P176_SERIAL_CONFIG;
-  _rxPin       = CONFIG_PIN1;
-  _txPin       = CONFIG_PIN2;
-  _ledPin      = P176_GET_LED_PIN;
-  _ledInverted = P176_GET_LED_INVERTED;
+  _port         = static_cast<ESPEasySerialPort>(CONFIG_PORT);
+  _baud         = P176_SERIAL_BAUDRATE;
+  _config       = P176_SERIAL_CONFIG;
+  _serialBuffer = P176_SERIAL_BUFFER;
+  _rxPin        = CONFIG_PIN1;
+  _txPin        = CONFIG_PIN2;
+  _ledPin       = P176_GET_LED_PIN;
+  _ledInverted  = P176_GET_LED_INVERTED;
+  _rxWait       = P176_RX_WAIT;
   # if P176_FAIL_CHECKSUM
   _failChecksum = P176_GET_FAIL_CHECKSUM;
   # endif // if P176_FAIL_CHECKSUM
+  # if P176_DEBUG
+  _debugLog = P176_GET_DEBUG_LOG;
+  # endif // if P176_DEBUG
+  _logQuiet = P176_GET_QUIET_LOG;
+  _dataLine.reserve(44); // Should be max. line-length sent, including CR/LF
 }
 
 P176_data_struct::~P176_data_struct() {
   delete _serial;
-  _data.clear();
 }
 
 bool P176_data_struct::init() {
-  delete _serial;
-
   if (ESPEasySerialPort::not_set != _port) {
-    _serial = new (std::nothrow) ESPeasySerial(_port, _rxPin, _txPin);
+    _serial = new (std::nothrow) ESPeasySerial(_port, _rxPin, _txPin, false, _serialBuffer);
 
     if (nullptr != _serial) {
       # if defined(ESP8266)
@@ -49,7 +53,7 @@ bool P176_data_struct::init() {
 /*****************************************************
 * plugin_read
 *****************************************************/
-bool P176_data_struct::plugin_read(struct EventStruct *event)           {
+bool P176_data_struct::plugin_read(struct EventStruct *event) {
   bool success = false;
 
   if (isInitialized()) {
@@ -60,7 +64,8 @@ bool P176_data_struct::plugin_read(struct EventStruct *event)           {
 
       if (getReceivedValue(key, value)) {
         int32_t iValue      = 0;
-        const float fFactor = getKeyFactor(key);
+        int32_t dummy       = 0;
+        const float fFactor = getKeyFactor(key, dummy);
 
         if (validIntFromString(value, iValue)) {
           UserVar.setFloat(event->TaskIndex, i, iValue * fFactor);
@@ -94,10 +99,14 @@ const char p176_factor_0_1[] PROGMEM =
   "ac_out_i|dc_in_i|"
 ;
 
-float P176_data_struct::getKeyFactor(const String& key) const {
+float P176_data_struct::getKeyFactor(const String& key,
+                                     int32_t     & nrDecimals) const {
+  nrDecimals = 0;
+
   if (key.isEmpty()) { return 1.0f; }
 
   if (GetCommandCode(key.c_str(), p176_factor_1000) > -1) {
+    nrDecimals = 3;
     return 0.001f;
   }
 
@@ -106,6 +115,7 @@ float P176_data_struct::getKeyFactor(const String& key) const {
   }
 
   if (GetCommandCode(key.c_str(), p176_factor_10) > -1) {
+    nrDecimals = 1;
     return 0.1f;
   }
 
@@ -117,9 +127,9 @@ float P176_data_struct::getKeyFactor(const String& key) const {
 }
 
 /*****************************************************
-* plugin_ten_per_second
+* plugin_fifty_per_second
 *****************************************************/
-bool P176_data_struct::plugin_ten_per_second(struct EventStruct *event)           {
+bool P176_data_struct::plugin_fifty_per_second(struct EventStruct *event) {
   bool success = false;
 
   if (isInitialized()) {
@@ -134,21 +144,23 @@ bool P176_data_struct::plugin_ten_per_second(struct EventStruct *event)         
 * plugin_get_config_value
 *****************************************************/
 bool P176_data_struct::plugin_get_config_value(struct EventStruct *event,
-                                               String            & string)           {
+                                               String            & string) {
   bool success = false;
 
   if (isInitialized()) {
-    const String key      = parseString(string, 1);
-    const String decimals = parseString(string, 2); // Optional decimals, default = 2, neg. = trim trailing zeroes
+    const String key      = parseString(string, 1, '.'); // Decimal point as separator, by convention
+    const String decimals = parseString(string, 2, '.'); // Optional decimals, neg. = trim trailing zeroes
     String value;
 
     if (getReceivedValue(key, value)) {
       int32_t iValue      = 0;
-      const float fFactor = getKeyFactor(key);
+      int32_t nrDecimals  = 0;
+      const float fFactor = getKeyFactor(key, nrDecimals);
 
-      if (!essentiallyEqual(fFactor, 1.0f) && validIntFromString(value, iValue)) {
-        int32_t nrDecimals = 2;
-        validIntFromString(decimals, nrDecimals);
+      if (validIntFromString(value, iValue)) {
+        if (!decimals.isEmpty()) {
+          validIntFromString(decimals, nrDecimals);
+        }
         string = toString(iValue * fFactor, abs(nrDecimals), nrDecimals < 0);
       } else {
         string = value;
@@ -160,11 +172,11 @@ bool P176_data_struct::plugin_get_config_value(struct EventStruct *event,
   return success;
 }
 
-size_t P176_data_struct::plugin_size_current_data() {
+size_t P176_data_struct::plugin_size_current_data() const {
   return _data.size();
 }
 
-bool P176_data_struct::plugin_show_current_data() {
+bool P176_data_struct::plugin_show_current_data() const {
   bool success = false;
 
   if (_data.size() > 0) {
@@ -175,15 +187,22 @@ bool P176_data_struct::plugin_show_current_data() {
 
     for (auto it = _data.begin(); it != _data.end(); ++it) {
       html_TR_TD();
-      addHtml(it->first);
+      const auto nm = _names.find(it->first);
+
+      if (nm != _names.end()) {
+        addHtml(nm->second);
+      } else {
+        addHtml(it->first);
+      }
       html_TD();
       addHtml(it->second);
       html_TD();
       int32_t iValue      = 0;
-      const float fFactor = getKeyFactor(it->first);
+      int32_t nrDecimals  = 0;
+      const float fFactor = getKeyFactor(it->first, nrDecimals);
 
-      if (!essentiallyEqual(fFactor, 1.0f) && validIntFromString(it->second, iValue)) {
-        addHtml(toString(iValue * fFactor, 3, true));
+      if (validIntFromString(it->second, iValue)) {
+        addHtml(toString(iValue * fFactor, abs(nrDecimals), nrDecimals < 0));
       }
     }
     html_end_table();
@@ -199,20 +218,22 @@ bool P176_data_struct::plugin_show_current_data() {
 * getReceivedValue
 *****************************************************/
 bool P176_data_struct::getReceivedValue(const String& key,
-                                        String      & value) {
+                                        String      & value) const {
   bool success = false;
 
   if (!key.isEmpty()) { // Find is case-sensitive
-    auto it = _data.find(key);
+    // const auto it = _data.find(key);
 
-    if (it != _data.end()) {
-      value   = it->second;
+    // if (it != _data.end()) {
+    //   value   = it->second;
+    if (_data.contains(key)) {
+      value   = _data.at(key);
       success = true;
     }
 
     # if P176_DEBUG
 
-    if (loglevelActiveFor(LOG_LEVEL_INFO)) {
+    if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
       addLog(LOG_LEVEL_INFO, strformat(F("P176 : getReceivedValue Key:%s, value:%s"),
                                        key.c_str(), value.c_str()));
     }
@@ -225,12 +246,10 @@ bool P176_data_struct::getReceivedValue(const String& key,
 * handleSerial
 *****************************************************/
 void P176_data_struct::handleSerial() {
-  int    timeOut   = _rxWait;
-  int    maxExtend = 5;
-  char   ch;
-  String dataLine;
-
-  dataLine.reserve(44); // Should be max. line-length sent, including CR/LF
+  int  timeOut   = _rxWait;
+  int  maxExtend = 3;
+  bool enough    = false;
+  uint8_t ch;
 
   do {
     if (_serial->available()) {
@@ -241,50 +260,64 @@ void P176_data_struct::handleSerial() {
       ch = static_cast<uint8_t>(_serial->read());
 
       # if P176_HANDLE_CHECKSUM
-      _checksum += static_cast<uint8_t>(ch);
-      _checksum &= 255;
+      _checksum += ch;
       # endif // if P176_HANDLE_CHECKSUM
 
-      if (ch == '\n') {
-        dataLine += static_cast<char>(ch); // append before processing
-        processBuffer(dataLine);           // Store data
-        dataLine.clear();
+      switch (ch) {
+        case '\r': // Ignore as it'll be stripped off
+          break;
+        case '\n':
+          // no need to append before processing, as it's stripped off
+          processBuffer(_dataLine); // Store data
+          _dataLine.clear();
+          enough = true;
 
-        # if P176_DEBUG
-        addLog(LOG_LEVEL_ERROR, strformat(F("P176 : Checksum state: %d"),
-                                          static_cast<uint8_t>(_checksumState)));
-        # endif // if P176_DEBUG
-        # if P176_HANDLE_CHECKSUM
+          # if P176_DEBUG
 
-        if (Checksum_state_e::ValidateNext == _checksumState) {
-          _checksumState = Checksum_state_e::Validating;
-        } else
-        if (Checksum_state_e::Starting == _checksumState) { // Start counting after a Checksum was received
-          _checksumState = Checksum_state_e::Counting;
-          _checksum      = 0;
-          #  ifndef BUILD_NO_DEBUG
-          addLog(LOG_LEVEL_DEBUG, F("Victron: Start counting for checksum"));
-          #  endif // ifndef BUILD_NO_DEBUG
-        }
-        # endif // if P176_HANDLE_CHECKSUM
-      } else
-      if (ch == '\t') {
-        # if P176_HANDLE_CHECKSUM
-
-        if (equals(dataLine, F("Checksum"))) {
-          if (Checksum_state_e::Counting == _checksumState) {
-            _checksumState = Checksum_state_e::ValidateNext;
-            #  ifndef BUILD_NO_DEBUG
-            addLog(LOG_LEVEL_INFO, F("Victron: Validate next checksum"));
-            #  endif // ifndef BUILD_NO_DEBUG
-          } else {
-            _checksumState = Checksum_state_e::Starting;
+          if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
+            addLog(LOG_LEVEL_INFO, strformat(F("P176 : Checksum state: %d"),
+                                             static_cast<uint8_t>(_checksumState)));
           }
-        }
-        # endif // if P176_HANDLE_CHECKSUM
-        dataLine += static_cast<char>(ch); // append after
-      } else {
-        dataLine += static_cast<char>(ch);
+          # endif // if P176_DEBUG
+          # if P176_HANDLE_CHECKSUM
+
+          if (Checksum_state_e::ValidateNext == _checksumState) {
+            _checksumState = Checksum_state_e::Validating;
+          } else
+          if (Checksum_state_e::Starting == _checksumState) { // Start counting after a Checksum was received
+            _checksumState = Checksum_state_e::Counting;
+            _checksum      = 0;
+            #  if P176_DEBUG
+
+            if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
+              addLog(LOG_LEVEL_INFO, F("P176 : Start counting for checksum"));
+            }
+            #  endif // if P176_DEBUG
+          }
+          # endif // if P176_HANDLE_CHECKSUM
+          break;
+        case '\t':
+          # if P176_HANDLE_CHECKSUM
+
+          if (equals(_dataLine, F("Checksum"))) {
+            if (Checksum_state_e::Counting == _checksumState) {
+              _checksumState = Checksum_state_e::ValidateNext;
+              #  if P176_DEBUG
+
+              if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
+                addLog(LOG_LEVEL_INFO, F("P176 : Validate next checksum"));
+              }
+              #  endif // if P176_DEBUG
+            } else {
+              _checksumState = Checksum_state_e::Starting;
+            }
+          }
+          # endif // if P176_HANDLE_CHECKSUM
+          _dataLine += static_cast<char>(ch); // append after
+          break;
+        default:
+          _dataLine += static_cast<char>(ch);
+          break;
       }
 
       # if P176_HANDLE_CHECKSUM
@@ -293,11 +326,17 @@ void P176_data_struct::handleSerial() {
         if (_checksum != 0) {
           _checksumState = Checksum_state_e::Error; // Error if resulting checksum isn't 0
           _checksumErrors++;
-          addLog(LOG_LEVEL_ERROR, strformat(F("Victron: Checksum error, expected 0 but counted %d"), _checksum));
+
+          if (loglevelActiveFor(LOG_LEVEL_ERROR)) {
+            addLog(LOG_LEVEL_ERROR, strformat(F("Victron: Checksum error, expected 0 but got %d"), _checksum));
+          }
         } else {
           _checksumState  = Checksum_state_e::Starting;
           _checksumErrors = 0;
-          addLog(LOG_LEVEL_INFO, strformat(F("Victron: Checksum validated Ok at %d"), _checksum));
+
+          if (loglevelActiveFor(LOG_LEVEL_INFO) && !_logQuiet) {
+            addLog(LOG_LEVEL_INFO, F("Victron: Checksum validated Ok"));
+          }
         }
 
         #  if P176_FAIL_CHECKSUM
@@ -320,28 +359,44 @@ void P176_data_struct::handleSerial() {
           timeOut = _rxWait;
           maxExtend--;
         } else {
-          break;
+          enough = true;
+          # if P176_DEBUG
+          #  ifndef BUILD_NO_DEBUG
+
+          if (loglevelActiveFor(LOG_LEVEL_DEBUG) && _debugLog) {
+            addLog(LOG_LEVEL_DEBUG, F("P176 : RX Receive Timeout reached"));
+          }
+          #  endif // ifndef BUILD_NO_DEBUG
+          # endif // if P176_DEBUG
         }
       }
       delay(1);
       --timeOut;
     }
-  } while (true);
+  } while (!enough);
 }
 
 /*****************************************************
 * processBuffer
 *****************************************************/
 void P176_data_struct::processBuffer(const String& message) {
-  if (!Settings.UseRules || message.isEmpty()) { return; }
-  const String key   = parseString(message, 1, '\t');
+  if (message.isEmpty()) { return; }
+  const String name  = parseStringKeepCase(message, 1, '\t');
   const String value = parseStringToEndKeepCase(message, 2, '\t');
+  String key(name);
+  key.toLowerCase();
 
   # if P176_DEBUG
-  addLog(LOG_LEVEL_INFO, strformat(F("P176 : Processing data '%s\t%s', checksum: %d"), key.c_str(), value.c_str(), _checksum));
+
+  if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
+    addLog(LOG_LEVEL_INFO, strformat(F("P176 : Processing data '%s\t%s', checksum: %d"), name.c_str(), value.c_str(), _checksum));
+  }
   # endif // if P176_DEBUG
 
   if (!key.isEmpty() && !value.isEmpty() && !equals(key, F("checksum"))) {
+    if (!_names.contains(key)) {
+      _names[key] = name; // Store original name
+    }
     # if P176_FAIL_CHECKSUM
     _temp[key] = value;
     # else // if P176_FAIL_CHECKSUM
@@ -359,10 +414,13 @@ void P176_data_struct::moveTempToData() {
   for (auto it = _temp.begin(); it != _temp.end(); ++it) {
     _data[it->first] = it->second;
   }
-  _temp.clear();
   #  if P176_DEBUG
-  addLog(LOG_LEVEL_INFO, F("P176 : Moving _temp to _data"));
+
+  if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
+    addLog(LOG_LEVEL_INFO, strformat(F("P176 : Moving %d _temp items to _data"), _temp.size()));
+  }
   #  endif // if P176_DEBUG
+  _temp.clear();
 }
 
 # endif // if P176_FAIL_CHECKSUM

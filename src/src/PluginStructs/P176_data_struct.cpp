@@ -222,12 +222,16 @@ bool P176_data_struct::getReceivedValue(const String& key,
   bool success = false;
 
   if (!key.isEmpty()) { // Find is case-sensitive
-    // const auto it = _data.find(key);
+    # ifdef ESP8266
+    const auto it = _data.find(key);
 
-    // if (it != _data.end()) {
-    //   value   = it->second;
+    if (it != _data.end()) {
+      value = it->second;
+    # else // ifdef ESP8266
+
     if (_data.contains(key)) {
-      value   = _data.at(key);
+      value = _data.at(key);
+    # endif // ifdef ESP8266
       success = true;
     }
 
@@ -394,7 +398,11 @@ void P176_data_struct::processBuffer(const String& message) {
   # endif // if P176_DEBUG
 
   if (!key.isEmpty() && !value.isEmpty() && !equals(key, F("checksum"))) {
-    if (!_names.contains(key)) {
+    # ifndef ESP8266
+
+    if (!_names.contains(key))
+    # endif // ifndef ESP8266
+    {
       _names[key] = name; // Store original name
     }
     # if P176_FAIL_CHECKSUM

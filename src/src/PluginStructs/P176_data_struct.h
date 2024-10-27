@@ -56,10 +56,18 @@ public:
   bool   plugin_fifty_per_second(struct EventStruct *event);
   bool   plugin_get_config_value(struct EventStruct *event,
                                  String            & string);
-  size_t plugin_size_current_data() const;
-  bool   plugin_show_current_data() const;
+  size_t getCurrentDataSize() const;
+  bool   showCurrentData() const;
   bool   isInitialized() const {
     return nullptr != _serial;
+  }
+
+  uint32_t getSuccessfulPackets() const {
+    return _successCounter;
+  }
+
+  uint32_t getChecksumErrors() const {
+    return _checksumErrors;
   }
 
 private:
@@ -68,7 +76,7 @@ private:
                      int32_t     & nrDecimals) const;
   bool  getReceivedValue(const String& key,
                          String      & value) const;
-  void  handleSerial();
+  bool  handleSerial();
   void  processBuffer(const String& message);
   # if P176_FAIL_CHECKSUM
   void  moveTempToData();
@@ -76,6 +84,8 @@ private:
 
   ESPeasySerial *_serial = nullptr;
 
+  uint32_t          _successCounter = 0;
+  uint32_t          _checksumDelta  = 0;
   int               _rxWait         = 0;
   int               _baud           = P176_DEFAULT_BAUDRATE;
   uint32_t          _checksumErrors = 0;

@@ -133,7 +133,9 @@ bool P176_data_struct::plugin_fifty_per_second(struct EventStruct *event) {
   bool success = false;
 
   if (isInitialized()) {
-    handleSerial(); // Read and process data
+    if (handleSerial()) { // Read and process data
+      plugin_read(event); // Update task values
+    }
     success = true;
   }
 
@@ -172,11 +174,17 @@ bool P176_data_struct::plugin_get_config_value(struct EventStruct *event,
   return success;
 }
 
-size_t P176_data_struct::plugin_size_current_data() const {
+/*****************************************************
+* getCurrentDataSize
+*****************************************************/
+size_t P176_data_struct::getCurrentDataSize() const {
   return _data.size();
 }
 
-bool P176_data_struct::plugin_show_current_data() const {
+/*****************************************************
+* showCurrentData
+*****************************************************/
+bool P176_data_struct::showCurrentData() const {
   bool success = false;
 
   if (_data.size() > 0) {
@@ -207,8 +215,6 @@ bool P176_data_struct::plugin_show_current_data() const {
     }
     html_end_table();
   }
-  addHtml(F("Recent checksum errors: "));
-  addHtmlInt(_checksumErrors);
   return success;
 }
 
@@ -249,10 +255,11 @@ bool P176_data_struct::getReceivedValue(const String& key,
 /*****************************************************
 * handleSerial
 *****************************************************/
-void P176_data_struct::handleSerial() {
+bool P176_data_struct::handleSerial() {
   int  timeOut   = _rxWait;
   int  maxExtend = 3;
   bool enough    = false;
+  bool result    = false; // True for a successfully received packet, with a correct checksum or _failChecksum = false
   uint8_t ch;
 
   do {
@@ -330,13 +337,21 @@ void P176_data_struct::handleSerial() {
         if (_checksum != 0) {
           _checksumState = Checksum_state_e::Error; // Error if resulting checksum isn't 0
           _checksumErrors++;
+          _checksumDelta = 0;
 
           if (loglevelActiveFor(LOG_LEVEL_ERROR)) {
             addLog(LOG_LEVEL_ERROR, strformat(F("Victron: Checksum error, expected 0 but got %d"), _checksum));
           }
         } else {
-          _checksumState  = Checksum_state_e::Starting;
-          _checksumErrors = 0;
+          _checksumState = Checksum_state_e::Starting;
+          _successCounter++;
+          _checksumDelta++;
+          result = true;
+
+          if (_checksumDelta >= 50) {
+            _checksumErrors = 0;
+          }
+
 
           if (loglevelActiveFor(LOG_LEVEL_INFO) && !_logQuiet) {
             addLog(LOG_LEVEL_INFO, F("Victron: Checksum validated Ok"));
@@ -347,6 +362,7 @@ void P176_data_struct::handleSerial() {
 
         if ((Checksum_state_e::Error != _checksumState) || !_failChecksum) {
           moveTempToData();
+          result = true; // In case of a failed checksum
         }
         #  endif // if P176_FAIL_CHECKSUM
       }
@@ -378,6 +394,7 @@ void P176_data_struct::handleSerial() {
       --timeOut;
     }
   } while (!enough);
+  return result;
 }
 
 /*****************************************************

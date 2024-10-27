@@ -6,6 +6,8 @@
 // #######################################################################################################
 
 /**
+ * 2024-10-27 tonhuisman: Update TaskValues as soon as data arrives (successfully), show successfully received packet count,
+ *                        reset checksum error count after 50 successful packets
  * 2024-10-26 tonhuisman: Add setting for RX buffer size and optional Debug logging. Add Quit log to suppress most logging
  *                        Store original received data names, to show in Device configuration, add default decimals to conversion factors
  *                        Improved serial processing reading per line instead of per data-block, moved to 50/sec
@@ -133,17 +135,22 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       {
         P176_data_struct *P176_data = static_cast<P176_data_struct *>(getPluginTaskData(event->TaskIndex));
 
-        if ((nullptr != P176_data) && (P176_data->plugin_size_current_data() > 0)) {
+        if ((nullptr != P176_data) && (P176_data->getCurrentDataSize() > 0)) {
           addFormSubHeader(F("Current data"));
           addRowLabel(F("Recently received data"));
-          P176_data->plugin_show_current_data();
+          P176_data->showCurrentData();
+          addRowLabel(F("Successfully received packets"));
+          addHtmlInt(P176_data->getSuccessfulPackets());
+          addRowLabel(F("Recent checksum errors"));
+          addHtmlInt(P176_data->getChecksumErrors());
+          addUnit(F("reset after 50 successful packets"));
         }
       }
       # if P176_DEBUG
       addFormSubHeader(F("Logging"));
-      addFormCheckBox(F("Enable logging (for debug)"),  F("pdebug"), P176_GET_DEBUG_LOG);
+      addFormCheckBox(F("Enable logging (for debug)"),      F("pdebug"), P176_GET_DEBUG_LOG);
       # endif // if P176_DEBUG
-      addFormCheckBox(F("Quiet logging (minimal log)"), F("pquiet"), P176_GET_QUIET_LOG);
+      addFormCheckBox(F("Quiet logging (reduces logging)"), F("pquiet"), P176_GET_QUIET_LOG);
       success = true;
       break;
     }

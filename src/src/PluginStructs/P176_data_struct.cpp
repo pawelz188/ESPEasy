@@ -17,9 +17,9 @@ P176_data_struct::P176_data_struct(struct EventStruct *event) {
   _ledPin       = P176_GET_LED_PIN;
   _ledInverted  = P176_GET_LED_INVERTED;
   _rxWait       = P176_RX_WAIT;
-  # if P176_FAIL_CHECKSUM
+  # if P176_HANDLE_CHECKSUM && P176_FAIL_CHECKSUM
   _failChecksum = P176_GET_FAIL_CHECKSUM;
-  # endif // if P176_FAIL_CHECKSUM
+  # endif // if P176_HANDLE_CHECKSUM && P176_FAIL_CHECKSUM
   # if P176_DEBUG
   _debugLog = P176_GET_DEBUG_LOG;
   # endif // if P176_DEBUG
@@ -283,14 +283,14 @@ bool P176_data_struct::handleSerial() {
           _dataLine.clear();
           enough = true;
 
-          # if P176_DEBUG
+          # if P176_HANDLE_CHECKSUM
+          #  if P176_DEBUG
 
           if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
             addLog(LOG_LEVEL_INFO, strformat(F("P176 : Checksum state: %d"),
                                              static_cast<uint8_t>(_checksumState)));
           }
-          # endif // if P176_DEBUG
-          # if P176_HANDLE_CHECKSUM
+          #  endif // if P176_DEBUG
 
           if (Checksum_state_e::ValidateNext == _checksumState) {
             _checksumState = Checksum_state_e::Validating;
@@ -410,7 +410,15 @@ void P176_data_struct::processBuffer(const String& message) {
   # if P176_DEBUG
 
   if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
-    addLog(LOG_LEVEL_INFO, strformat(F("P176 : Processing data '%s\t%s', checksum: %d"), name.c_str(), value.c_str(), _checksum));
+    addLog(LOG_LEVEL_INFO, strformat(F("P176 : Processing data '%s\t%s'"
+                                       #  if P176_HANDLE_CHECKSUM
+                                       ", checksum: %d"
+                                       #  endif // if P176_HANDLE_CHECKSUM
+                                       ), name.c_str(), value.c_str()
+                                     #  if P176_HANDLE_CHECKSUM
+                                     , _checksum
+                                     #  endif // if P176_HANDLE_CHECKSUM
+                                     ));
   }
   # endif // if P176_DEBUG
 

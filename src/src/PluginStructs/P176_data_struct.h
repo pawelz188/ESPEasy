@@ -62,6 +62,7 @@ public:
     return nullptr != _serial;
   }
 
+  # if P176_HANDLE_CHECKSUM
   uint32_t getSuccessfulPackets() const {
     return _successCounter;
   }
@@ -69,6 +70,8 @@ public:
   uint32_t getChecksumErrors() const {
     return _checksumErrors;
   }
+
+  # endif // if P176_HANDLE_CHECKSUM
 
 private:
 
@@ -84,12 +87,14 @@ private:
 
   ESPeasySerial *_serial = nullptr;
 
-  uint32_t          _successCounter = 0;
-  uint32_t          _checksumDelta  = 0;
-  int               _rxWait         = 0;
-  int               _baud           = P176_DEFAULT_BAUDRATE;
-  uint32_t          _checksumErrors = 0;
-  unsigned int      _serialBuffer   = P176_DEFAULT_BUFFER;
+  # if P176_HANDLE_CHECKSUM
+  uint32_t _checksumErrors = 0;
+  uint32_t _checksumDelta  = 0;
+  uint32_t _successCounter = 0;
+  # endif // if P176_HANDLE_CHECKSUM
+  int               _rxWait       = 0;
+  int               _baud         = P176_DEFAULT_BAUDRATE;
+  unsigned int      _serialBuffer = P176_DEFAULT_BUFFER;
   String            _dataLine;
   int8_t            _ledPin      = -1;
   bool              _ledInverted = false;

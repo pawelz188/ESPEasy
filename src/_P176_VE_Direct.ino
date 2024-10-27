@@ -80,7 +80,9 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       P176_SERIAL_BAUDRATE = P176_DEFAULT_BAUDRATE;
       P176_SERIAL_BUFFER   = P176_DEFAULT_BUFFER;
       P176_RX_WAIT         = P176_DEFAULT_RX_WAIT;
+      # if P176_FAIL_CHECKSUM
       P176_SET_FAIL_CHECKSUM(P176_DEFAULT_FAIL_CHECKSUM);
+      # endif // if P176_FAIL_CHECKSUM
       P176_SET_LED_PIN(-1);
       P176_SET_QUIET_LOG(true);
     }
@@ -139,11 +141,13 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
           addFormSubHeader(F("Current data"));
           addRowLabel(F("Recently received data"));
           P176_data->showCurrentData();
+          # if P176_HANDLE_CHECKSUM
           addRowLabel(F("Successfully received packets"));
           addHtmlInt(P176_data->getSuccessfulPackets());
           addRowLabel(F("Recent checksum errors"));
           addHtmlInt(P176_data->getChecksumErrors());
           addUnit(F("reset after 50 successful packets"));
+          # endif // if P176_HANDLE_CHECKSUM
         }
       }
       # if P176_DEBUG
@@ -181,7 +185,7 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       P176_data_struct *P176_data = static_cast<P176_data_struct *>(getPluginTaskData(event->TaskIndex));
 
       success = (nullptr != P176_data) && P176_data->init();
-      int8_t _ledPin = P176_GET_LED_PIN;
+      const int8_t _ledPin = P176_GET_LED_PIN;
 
       if (validGpio(_ledPin)) {
         DIRECT_PINMODE_OUTPUT(_ledPin);

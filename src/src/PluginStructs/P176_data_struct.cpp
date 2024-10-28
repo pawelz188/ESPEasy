@@ -44,6 +44,11 @@ bool P176_data_struct::init() {
       # ifndef BUILD_NO_DEBUG
       addLog(LOG_LEVEL_DEBUG, F("Victron: Serial port started"));
       # endif // ifndef BUILD_NO_DEBUG
+
+      if (validGpio(_ledPin)) {
+        DIRECT_PINMODE_OUTPUT(_ledPin);
+        DIRECT_pinWrite(_ledPin, _ledInverted ? 1 : 0); // Led off
+      }
     }
   }
 

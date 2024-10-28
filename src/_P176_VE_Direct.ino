@@ -26,8 +26,6 @@
 
 # include "./src/PluginStructs/P176_data_struct.h"
 
-# include <GPIO_Direct_Access.h>
-
 boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
 {
   boolean success = false;
@@ -185,12 +183,6 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       P176_data_struct *P176_data = static_cast<P176_data_struct *>(getPluginTaskData(event->TaskIndex));
 
       success = (nullptr != P176_data) && P176_data->init();
-      const int8_t _ledPin = P176_GET_LED_PIN;
-
-      if (validGpio(_ledPin)) {
-        DIRECT_PINMODE_OUTPUT(_ledPin);
-        DIRECT_pinWrite(_ledPin, P176_GET_LED_INVERTED ? 1 : 0); // Led off
-      }
 
       break;
     }

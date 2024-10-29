@@ -45,8 +45,6 @@ Device Settings
 
 * **Baud Rate / Serial config**: See *Serial helper configuration*, above.
 
-* **RX Receive timeout**: If parts of serial data packets are somewhat delayed, but should still be handled as a single message, then the delay to wait for the next part can be configured here. 0 disables the delay.
-
 * **RX Buffersize**: The buffer to be used for ESPEasySerial, default and minimum is 128 bytes. Can be expanded up to 2048 bytes if processing of the received data takes too much time and data gets discarded. 
 
 * **Ignore data on checksum error**: The protocol includes a checksum calculation, and when this fails, the data is probably unreliable, and should better be dismissed.

@@ -16,7 +16,6 @@ P176_data_struct::P176_data_struct(struct EventStruct *event) {
   _txPin        = CONFIG_PIN2;
   _ledPin       = P176_GET_LED_PIN;
   _ledInverted  = P176_GET_LED_INVERTED;
-  _rxWait       = P176_RX_WAIT;
   # if P176_HANDLE_CHECKSUM && P176_FAIL_CHECKSUM
   _failChecksum = P176_GET_FAIL_CHECKSUM;
   # endif // if P176_HANDLE_CHECKSUM && P176_FAIL_CHECKSUM
@@ -41,13 +40,13 @@ bool P176_data_struct::init() {
       # elif defined(ESP32)
       _serial->begin(_baud, _config);
       # endif // if defined(ESP8266)
-      # ifndef BUILD_NO_DEBUG
-      addLog(LOG_LEVEL_DEBUG, F("Victron: Serial port started"));
-      # endif // ifndef BUILD_NO_DEBUG
+      addLog(LOG_LEVEL_INFO, F("Victron: Serial port started"));
 
       if (validGpio(_ledPin)) {
         DIRECT_PINMODE_OUTPUT(_ledPin);
         DIRECT_pinWrite(_ledPin, _ledInverted ? 1 : 0); // Led off
+      } else {
+        _ledPin = -1;
       }
     }
   }
@@ -65,17 +64,11 @@ bool P176_data_struct::plugin_read(struct EventStruct *event) {
     for (uint8_t i = 0; i < VARS_PER_TASK; ++i) {
       String key = getTaskValueName(event->TaskIndex, i);
       key.toLowerCase();
-      String value;
+      VictronValue value;
 
-      if (getReceivedValue(key, value)) {
-        int32_t iValue      = 0;
-        int32_t dummy       = 0;
-        const float fFactor = getKeyFactor(key, dummy);
-
-        if (validIntFromString(value, iValue)) {
-          UserVar.setFloat(event->TaskIndex, i, iValue * fFactor);
-          success = true;
-        }
+      if (getReceivedValue(key, value) && value.isNumeric()) {
+        UserVar.setFloat(event->TaskIndex, i, value.getNumValue());
+        success = true;
       }
     }
   }
@@ -155,23 +148,11 @@ bool P176_data_struct::plugin_get_config_value(struct EventStruct *event,
   bool success = false;
 
   if (isInitialized()) {
-    const String key      = parseString(string, 1, '.'); // Decimal point as separator, by convention
-    const String decimals = parseString(string, 2, '.'); // Optional decimals, neg. = trim trailing zeroes
-    String value;
+    const String key = parseString(string, 1, '.'); // Decimal point as separator, by convention
+    VictronValue value;
 
     if (getReceivedValue(key, value)) {
-      int32_t iValue      = 0;
-      int32_t nrDecimals  = 0;
-      const float fFactor = getKeyFactor(key, nrDecimals);
-
-      if (validIntFromString(value, iValue)) {
-        if (!decimals.isEmpty()) {
-          validIntFromString(decimals, nrDecimals);
-        }
-        string = toString(iValue * fFactor, abs(nrDecimals), nrDecimals < 0);
-      } else {
-        string = value;
-      }
+      string  = value.getValue();
       success = true;
     }
   }
@@ -200,22 +181,13 @@ bool P176_data_struct::showCurrentData() const {
 
     for (auto it = _data.begin(); it != _data.end(); ++it) {
       html_TR_TD();
-      const auto nm = _names.find(it->first);
-
-      if (nm != _names.end()) {
-        addHtml(nm->second);
-      } else {
-        addHtml(it->first);
-      }
+      addHtml(it->second.getName());
       html_TD();
-      addHtml(it->second);
+      addHtml(it->second.getRawValue());
       html_TD();
-      int32_t iValue      = 0;
-      int32_t nrDecimals  = 0;
-      const float fFactor = getKeyFactor(it->first, nrDecimals);
 
-      if (validIntFromString(it->second, iValue)) {
-        addHtml(toString(iValue * fFactor, abs(nrDecimals), nrDecimals < 0));
+      if (it->second.isNumeric()) {
+        addHtml(it->second.getValue());
       }
     }
     html_end_table();
@@ -229,7 +201,7 @@ bool P176_data_struct::showCurrentData() const {
 * getReceivedValue
 *****************************************************/
 bool P176_data_struct::getReceivedValue(const String& key,
-                                        String      & value) const {
+                                        VictronValue& value) const {
   bool success = false;
 
   if (!key.isEmpty()) { // Find is case-sensitive
@@ -250,7 +222,7 @@ bool P176_data_struct::getReceivedValue(const String& key,
 
     if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
       addLog(LOG_LEVEL_INFO, strformat(F("P176 : getReceivedValue Key:%s, value:%s"),
-                                       key.c_str(), value.c_str()));
+                                       key.c_str(), value.getRawValue().c_str()));
     }
     # endif // if P176_DEBUG
   }
@@ -261,15 +233,13 @@ bool P176_data_struct::getReceivedValue(const String& key,
 * handleSerial
 *****************************************************/
 bool P176_data_struct::handleSerial() {
-  int  timeOut   = _rxWait;
-  int  maxExtend = 3;
-  bool enough    = false;
-  bool result    = false; // True for a successfully received packet, with a correct checksum or _failChecksum = false
+  bool enough = false;
+  bool result = false; // True for a successfully received packet, with a correct checksum or _failChecksum = false
   uint8_t ch;
 
   do {
     if (_serial->available()) {
-      if (validGpio(_ledPin)) {
+      if (_ledPin != -1) {
         DIRECT_pinWrite(_ledPin, _ledInverted ? 0 : 1);
       }
 
@@ -373,30 +343,11 @@ bool P176_data_struct::handleSerial() {
       }
       # endif // if P176_HANDLE_CHECKSUM
 
-      if (validGpio(_ledPin)) {
+      if (_ledPin != -1) {
         DIRECT_pinWrite(_ledPin, _ledInverted ? 1 : 0);
       }
-
-      timeOut = _rxWait; // if serial received, reset timeout counter
     } else {
-      if (timeOut <= 0) {
-        if ((_rxWait > 0) && (maxExtend > 0)) {
-          timeOut = _rxWait;
-          maxExtend--;
-        } else {
-          enough = true;
-          # if P176_DEBUG
-          #  ifndef BUILD_NO_DEBUG
-
-          if (loglevelActiveFor(LOG_LEVEL_DEBUG) && _debugLog) {
-            addLog(LOG_LEVEL_DEBUG, F("P176 : RX Receive Timeout reached"));
-          }
-          #  endif // ifndef BUILD_NO_DEBUG
-          # endif // if P176_DEBUG
-        }
-      }
-      delay(1);
-      --timeOut;
+      enough = !_serial->available();
     }
   } while (!enough);
   return result;
@@ -428,18 +379,24 @@ void P176_data_struct::processBuffer(const String& message) {
   # endif // if P176_DEBUG
 
   if (!key.isEmpty() && !value.isEmpty() && !equals(key, F("checksum"))) {
-    # ifndef ESP8266
-
-    if (!_names.contains(key))
-    # endif // ifndef ESP8266
-    {
-      _names[key] = name; // Store original name
-    }
     # if P176_FAIL_CHECKSUM
-    _temp[key] = value;
+    auto it = _temp.find(key);
     # else // if P176_FAIL_CHECKSUM
-    _data[key] = value;
+    auto it = _data.find(key);
     # endif // if P176_FAIL_CHECKSUM
+
+    if (it == _temp.end()) {
+      int32_t nrDecimals{};
+      float   factor = getKeyFactor(key, nrDecimals);
+      VictronValue val(name, value, factor, nrDecimals);
+      # if P176_FAIL_CHECKSUM
+      _temp[key] = std::move(val);
+      # else // if P176_FAIL_CHECKSUM
+      _data[key] = std::move(val);
+      # endif // if P176_FAIL_CHECKSUM
+    } else {
+      it->second.update(value);
+    }
   }
 }
 
@@ -450,7 +407,7 @@ void P176_data_struct::processBuffer(const String& message) {
 *****************************************************/
 void P176_data_struct::moveTempToData() {
   for (auto it = _temp.begin(); it != _temp.end(); ++it) {
-    _data[it->first] = it->second;
+    _data[it->first] = std::move(it->second);
   }
   #  if P176_DEBUG
 

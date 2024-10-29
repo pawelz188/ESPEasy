@@ -13,7 +13,6 @@
 
 # define P176_SERIAL_CONFIG             PCONFIG(0)
 # define P176_SERIAL_BAUDRATE           PCONFIG_LONG(1)
-# define P176_RX_WAIT                   PCONFIG(2)
 # define P176_SERIAL_BUFFER             PCONFIG(3)
 
 # define P176_FLAGS                     PCONFIG_ULONG(0)
@@ -39,7 +38,6 @@
 
 # define P176_DEFAULT_BAUDRATE          19200
 # define P176_DEFAULT_BUFFER            128
-# define P176_DEFAULT_RX_WAIT           5
 # define P176_DEFAULT_FAIL_CHECKSUM     true
 
 struct P176_data_struct : public PluginTaskData_base {
@@ -75,10 +73,74 @@ public:
 
 private:
 
+  struct VictronValue {
+    VictronValue() {}
+
+    VictronValue(const String & name,
+                 const  String& value,
+                 const float  & factor,
+                 const int32_t& nrDecimals)
+      :_name(name), _factor(factor), _nrDecimals(nrDecimals)
+    {
+      update(value);
+    }
+
+    String getName() const {
+      return _name;
+    }
+
+    void update(const String& value) {
+      _changed = !_value.equals(value);
+      _value   = value;
+
+      if (_changed) {
+        int32_t iValue = 0;
+        _isNumeric = true;
+
+        if (validIntFromString(_value, iValue)) {
+          _numValue = iValue * _factor;
+        } else {
+          _isNumeric = false;
+        }
+        _changed = false;
+      }
+    }
+
+    bool isNumeric() const {
+      return _isNumeric;
+    }
+
+    String getValue() const {
+      if (!_isNumeric) {
+        return _value;
+      }
+
+      return toString(_numValue, _nrDecimals);
+    }
+
+    float getNumValue() const {
+      return _numValue;
+    }
+
+    String getRawValue() const {
+      return _value;
+    }
+
+private:
+
+    String  _name;
+    String  _value;
+    float   _factor{};
+    float   _numValue{};
+    int32_t _nrDecimals{};
+    bool    _changed   = true;
+    bool    _isNumeric = true;
+  };
+
   float getKeyFactor(const String& key,
                      int32_t     & nrDecimals) const;
   bool  getReceivedValue(const String& key,
-                         String      & value) const;
+                         VictronValue& value) const;
   bool  handleSerial();
   void  processBuffer(const String& message);
   # if P176_FAIL_CHECKSUM
@@ -92,7 +154,6 @@ private:
   uint32_t _checksumDelta  = 0;
   uint32_t _successCounter = 0;
   # endif // if P176_HANDLE_CHECKSUM
-  int               _rxWait       = 0;
   int               _baud         = P176_DEFAULT_BAUDRATE;
   unsigned int      _serialBuffer = P176_DEFAULT_BUFFER;
   String            _dataLine;
@@ -122,10 +183,9 @@ private:
   # endif // if P176_HANDLE_CHECKSUM
 
   // Key is stored in lower-case as PLUGIN_GET_CONFIG_VALUE passes in the variable name in lower-case
-  std::map<String, String>_data{};
-  std::map<String, String>_names{};
+  std::map<String, VictronValue>_data{};
   # if P176_FAIL_CHECKSUM
-  std::map<String, String>_temp{};
+  std::map<String, VictronValue>_temp{};
   # endif // if P176_FAIL_CHECKSUM
 };
 

@@ -6,6 +6,8 @@
 // #######################################################################################################
 
 /**
+ * 2024-10-29 tonhuisman: Optimize receiving and processing data, resulting in much lower load (based on suggestions by TD-er)
+ *                        Removed the RX Timeout setting, as it doesn't help here, seems to slow things down.
  * 2024-10-27 tonhuisman: Update TaskValues as soon as data arrives (successfully), show successfully received packet count,
  *                        reset checksum error count after 50 successful packets
  * 2024-10-26 tonhuisman: Add setting for RX buffer size and optional Debug logging. Add Quit log to suppress most logging
@@ -77,7 +79,6 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       CONFIG_PIN2          = txPin;
       P176_SERIAL_BAUDRATE = P176_DEFAULT_BAUDRATE;
       P176_SERIAL_BUFFER   = P176_DEFAULT_BUFFER;
-      P176_RX_WAIT         = P176_DEFAULT_RX_WAIT;
       # if P176_FAIL_CHECKSUM
       P176_SET_FAIL_CHECKSUM(P176_DEFAULT_FAIL_CHECKSUM);
       # endif // if P176_FAIL_CHECKSUM
@@ -114,9 +115,6 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       addFormNumericBox(F("Baud Rate"), F("pbaud"), P176_SERIAL_BAUDRATE, 0);
       uint8_t serialConfChoice = serialHelper_convertOldSerialConfig(P176_SERIAL_CONFIG);
       serialHelper_serialconfig_webformLoad(event, serialConfChoice);
-
-      addFormNumericBox(F("RX Receive Timeout"), F("prxwait"), P176_RX_WAIT, 0, 200);
-      addUnit(F("mSec"));
 
       addFormNumericBox(F("RX buffersize"), F("pbuffer"), P176_SERIAL_BUFFER, 128, 2048);
       addUnit(F("128..2048"));
@@ -161,7 +159,6 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
     {
       P176_SERIAL_BAUDRATE = getFormItemInt(F("pbaud"));
       P176_SERIAL_CONFIG   = serialHelper_serialconfig_webformSave();
-      P176_RX_WAIT         = getFormItemInt(F("prxwait"));
       P176_SERIAL_BUFFER   = getFormItemInt(F("pbuffer"));
       P176_SET_LED_PIN(getFormItemInt(F("pledpin")));
       P176_SET_LED_INVERTED(isFormItemChecked(F("pledinv")));

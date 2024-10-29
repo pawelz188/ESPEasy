@@ -335,8 +335,9 @@ bool P176_data_struct::handleSerial() {
 
         #  if P176_FAIL_CHECKSUM
 
-        if ((Checksum_state_e::Error != _checksumState) || !_failChecksum) {
-          moveTempToData();
+        const bool checksumSuccess = (Checksum_state_e::Error != _checksumState) || !_failChecksum;
+        commitTempData(checksumSuccess);
+        if (checksumSuccess) {
           result = true; // In case of a failed checksum
         }
         #  endif // if P176_FAIL_CHECKSUM
@@ -379,23 +380,15 @@ void P176_data_struct::processBuffer(const String& message) {
   # endif // if P176_DEBUG
 
   if (!key.isEmpty() && !value.isEmpty() && !equals(key, F("checksum"))) {
-    # if P176_FAIL_CHECKSUM
-    auto it = _temp.find(key);
-    # else // if P176_FAIL_CHECKSUM
     auto it = _data.find(key);
-    # endif // if P176_FAIL_CHECKSUM
 
-    if (it == _temp.end()) {
+    if (it == _data.end()) {
       int32_t nrDecimals{};
       float   factor = getKeyFactor(key, nrDecimals);
       VictronValue val(name, value, factor, nrDecimals);
-      # if P176_FAIL_CHECKSUM
-      _temp[key] = std::move(val);
-      # else // if P176_FAIL_CHECKSUM
       _data[key] = std::move(val);
-      # endif // if P176_FAIL_CHECKSUM
     } else {
-      it->second.update(value);
+      it->second.set(value);
     }
   }
 }
@@ -403,19 +396,21 @@ void P176_data_struct::processBuffer(const String& message) {
 # if P176_FAIL_CHECKSUM
 
 /*****************************************************
-* moveTempToData
+* commitTempData
 *****************************************************/
-void P176_data_struct::moveTempToData() {
-  for (auto it = _temp.begin(); it != _temp.end(); ++it) {
-    _data[it->first] = std::move(it->second);
+bool P176_data_struct::commitTempData(bool checksumSuccess) {
+  size_t nrChanged = 0;
+  for (auto it = _data.begin(); it != _data.end(); ++it) {
+    if (it->second.commitTempData(checksumSuccess))
+      ++nrChanged;
   }
   #  if P176_DEBUG
 
   if (loglevelActiveFor(LOG_LEVEL_INFO) && _debugLog) {
-    addLog(LOG_LEVEL_INFO, strformat(F("P176 : Moving %d _temp items to _data"), _temp.size()));
+    addLog(LOG_LEVEL_INFO, strformat(F("P176 : Moving %d _temp items to _data"), nrChanged));
   }
   #  endif // if P176_DEBUG
-  _temp.clear();
+  return nrChanged != 0;
 }
 
 # endif // if P176_FAIL_CHECKSUM

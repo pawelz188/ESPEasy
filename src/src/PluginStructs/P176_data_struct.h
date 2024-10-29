@@ -82,12 +82,22 @@ private:
                  const int32_t& nrDecimals)
       :_name(name), _factor(factor), _nrDecimals(nrDecimals)
     {
-      update(value);
+      set(value);
     }
 
     String getName() const {
       return _name;
     }
+
+    void set(const String& value) {
+# if P176_FAIL_CHECKSUM
+_valueTemp = value;
+#else
+      update(value);
+#endif
+    }
+
+private:
 
     void update(const String& value) {
       _changed = !_value.equals(value);
@@ -105,6 +115,8 @@ private:
         _changed = false;
       }
     }
+
+public:
 
     bool isNumeric() const {
       return _isNumeric;
@@ -126,10 +138,26 @@ private:
       return _value;
     }
 
+# if P176_FAIL_CHECKSUM
+    bool commitTempData(bool checksumSuccess) {
+      if (_valueTemp.isEmpty()) {
+        return false;
+      }
+      if (checksumSuccess) {
+        update(_valueTemp);
+      }
+      _valueTemp.clear();
+      return checksumSuccess;
+    }
+#endif
+
 private:
 
     String  _name;
     String  _value;
+# if P176_FAIL_CHECKSUM
+    String  _valueTemp;
+#endif
     float   _factor{};
     float   _numValue{};
     int32_t _nrDecimals{};
@@ -144,7 +172,7 @@ private:
   bool  handleSerial();
   void  processBuffer(const String& message);
   # if P176_FAIL_CHECKSUM
-  void  moveTempToData();
+  bool  commitTempData(bool checksumSuccess);
   # endif // if P176_FAIL_CHECKSUM
 
   ESPeasySerial *_serial = nullptr;
@@ -184,9 +212,6 @@ private:
 
   // Key is stored in lower-case as PLUGIN_GET_CONFIG_VALUE passes in the variable name in lower-case
   std::map<String, VictronValue>_data{};
-  # if P176_FAIL_CHECKSUM
-  std::map<String, VictronValue>_temp{};
-  # endif // if P176_FAIL_CHECKSUM
 };
 
 #endif // ifdef USES_P176

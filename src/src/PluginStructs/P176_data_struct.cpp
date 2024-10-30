@@ -233,17 +233,19 @@ bool P176_data_struct::getReceivedValue(const String& key,
 * handleSerial
 *****************************************************/
 bool P176_data_struct::handleSerial() {
-  bool enough = false;
-  bool result = false; // True for a successfully received packet, with a correct checksum or _failChecksum = false
+  bool enough    = false;
+  bool result    = false; // True for a successfully received packet, with a correct checksum or _failChecksum = false
+  int  available = _serial->available();
   uint8_t ch;
 
   do {
-    if (_serial->available()) {
+    if (available > 0) {
       if (_ledPin != -1) {
         DIRECT_pinWrite(_ledPin, _ledInverted ? 0 : 1);
       }
 
       ch = static_cast<uint8_t>(_serial->read());
+      available--;
 
       # if P176_HANDLE_CHECKSUM
       _checksum += ch;
@@ -337,6 +339,7 @@ bool P176_data_struct::handleSerial() {
 
         const bool checksumSuccess = (Checksum_state_e::Error != _checksumState) || !_failChecksum;
         commitTempData(checksumSuccess);
+
         if (checksumSuccess) {
           result = true; // In case of a failed checksum
         }
@@ -348,7 +351,8 @@ bool P176_data_struct::handleSerial() {
         DIRECT_pinWrite(_ledPin, _ledInverted ? 1 : 0);
       }
     } else {
-      enough = !_serial->available();
+      available = _serial->available();
+      enough    = available <= 0;
     }
   } while (!enough);
   return result;
@@ -400,9 +404,11 @@ void P176_data_struct::processBuffer(const String& message) {
 *****************************************************/
 bool P176_data_struct::commitTempData(bool checksumSuccess) {
   size_t nrChanged = 0;
+
   for (auto it = _data.begin(); it != _data.end(); ++it) {
-    if (it->second.commitTempData(checksumSuccess))
+    if (it->second.commitTempData(checksumSuccess)) {
       ++nrChanged;
+    }
   }
   #  if P176_DEBUG
 

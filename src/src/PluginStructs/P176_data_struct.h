@@ -91,10 +91,10 @@ private:
 
     void set(const String& value) {
 # if P176_FAIL_CHECKSUM
-_valueTemp = value;
-#else
+      _valueTemp = value;
+# else // if P176_FAIL_CHECKSUM
       update(value);
-#endif
+# endif // if P176_FAIL_CHECKSUM
     }
 
 private:
@@ -143,21 +143,23 @@ public:
       if (_valueTemp.isEmpty()) {
         return false;
       }
+
       if (checksumSuccess) {
         update(_valueTemp);
       }
       _valueTemp.clear();
       return checksumSuccess;
     }
-#endif
+
+# endif // if P176_FAIL_CHECKSUM
 
 private:
 
-    String  _name;
-    String  _value;
+    String _name;
+    String _value;
 # if P176_FAIL_CHECKSUM
-    String  _valueTemp;
-#endif
+    String _valueTemp;
+# endif // if P176_FAIL_CHECKSUM
     float   _factor{};
     float   _numValue{};
     int32_t _nrDecimals{};

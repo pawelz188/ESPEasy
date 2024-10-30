@@ -95,6 +95,8 @@ The *Data* column shows the actual data as received.
 
 The *Value* column shows a factored result based on the value, as mV is not always very useful, so that's converted to V, mA to A, Wh to kWh, etc.
 
+For items that use ON and OFF (or On and Off for older firmwares) as Data, these will be available as 1 and 0 respectively, so they can be used as Values. If needed, a transformation like ``[VE.Direct#Alarm#O]`` can be used to present the value as ON/OFF for 1/0. Adding the ``C`` justification, like ``[VE.Direct#Alarm#O#C]``, will be presented as On/Off.
+
 It shows that it has received 2 packets, but as a packet only contains a part of the available data, and a next packet another part, etc. there's no fixed relation to the amount of samples, and the number of packets received. Some devices may send all data in a single packet, other devices may need 3 or even 4 packets to send all available data.
 
 Also, the number of checksum errors is shown, this counter is automatically reset after receiving 50 consecutive correct packets.

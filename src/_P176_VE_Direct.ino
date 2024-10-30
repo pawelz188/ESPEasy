@@ -6,6 +6,7 @@
 // #######################################################################################################
 
 /** Changelog:
+ * 2024-10-30 tonhuisman: Accept ON/On and OFF/Off as 1 and 0 numeric values, to be able to use them as Values in the device configuration
  * 2024-10-30 tonhuisman: Simplifying the code somewhat, making it more robust, partially by TD-er
  * 2024-10-29 tonhuisman: Optimize receiving and processing data, resulting in much lower load (based on suggestions by TD-er)
  *                        Removed the RX Timeout setting, as it doesn't help here, seems to slow things down.

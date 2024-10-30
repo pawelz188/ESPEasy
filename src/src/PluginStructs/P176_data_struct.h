@@ -109,6 +109,12 @@ private:
 
         if (validIntFromString(_value, iValue)) {
           _numValue = iValue * _factor;
+        } else
+        if (_value.equalsIgnoreCase(F("ON"))) {  // Can be ON or On
+          _numValue = 1.0f;
+        } else
+        if (_value.equalsIgnoreCase(F("OFF"))) { // Can be OFF or Off
+          _numValue = 0.0f;
         } else {
           _isNumeric = false;
         }

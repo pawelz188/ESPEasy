@@ -5,7 +5,8 @@
 // ############################# Plugin 176: Communication - Victron VE.Direct ###########################
 // #######################################################################################################
 
-/**
+/** Changelog:
+ * 2024-10-30 tonhuisman: Simplifying the code somewhat, making it more robust, partially by TD-er
  * 2024-10-29 tonhuisman: Optimize receiving and processing data, resulting in much lower load (based on suggestions by TD-er)
  *                        Removed the RX Timeout setting, as it doesn't help here, seems to slow things down.
  * 2024-10-27 tonhuisman: Update TaskValues as soon as data arrives (successfully), show successfully received packet count,

@@ -91,7 +91,7 @@ This example shows the data as can be received from a VE.Direct device.
 
 The *Name* column is what should be used in the Values fields, or when as a ``<ValueName>`` from rules or in a display configuration. The exact meaning and unit of each field can be found in the VE.Direct protocol documentation, available from Victron Energy.
 
-The *Data* column shows the actual data as received.
+The *Data* column shows the actual data as received. If the checksum validation is enabled, this column may be empty if the checksum could not be verified, like the first (possibly incomplete) packet, but as the frequency of packets is rather high, this column should not often (or long) be empty.
 
 The *Value* column shows a factored result based on the value, as mV is not always very useful, so that's converted to V, mA to A, Wh to kWh, etc.
 

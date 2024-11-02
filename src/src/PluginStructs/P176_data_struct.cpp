@@ -272,7 +272,7 @@ bool P176_data_struct::handleSerial() {
           if (Checksum_state_e::ValidateNext == _checksumState) {
             _checksumState = Checksum_state_e::Validating;
           } else
-          if (Checksum_state_e::Starting == _checksumState) { // Start counting after a Checksum was received
+          if (Checksum_state_e::Starting == _checksumState) { // Start counting after a Checksum (aka 'end of packet') was received
             _checksumState = Checksum_state_e::Counting;
             _checksum      = 0;
             #  if P176_DEBUG
@@ -298,6 +298,10 @@ bool P176_data_struct::handleSerial() {
               #  endif // if P176_DEBUG
             } else {
               _checksumState = Checksum_state_e::Starting;
+              #  if P176_FAIL_CHECKSUM
+
+              commitTempData(!_failChecksum); // Discard any data received so far, as we don't know their checksum status
+              #  endif // if P176_FAIL_CHECKSUM
             }
           }
           # endif // if P176_HANDLE_CHECKSUM
@@ -317,10 +321,11 @@ bool P176_data_struct::handleSerial() {
           _checksumDelta = 0;
 
           if (loglevelActiveFor(LOG_LEVEL_ERROR)) {
-            addLog(LOG_LEVEL_ERROR, strformat(F("Victron: Checksum error, expected 0 but got %d"), _checksum));
+            addLog(LOG_LEVEL_ERROR, strformat(F("Victron: Checksum error, expected 0 but got %d (success: %d errors: %d)"),
+                                              _checksum, _successCounter, _checksumErrors));
           }
         } else {
-          _checksumState = Checksum_state_e::Starting;
+          _checksumState = Checksum_state_e::Counting; // New packet is expected, start counting immediately
           _successCounter++;
           _checksumDelta++;
           result = true;
@@ -334,6 +339,7 @@ bool P176_data_struct::handleSerial() {
             addLog(LOG_LEVEL_INFO, F("Victron: Checksum validated Ok"));
           }
         }
+        _checksum = 0; // Clean start
 
         #  if P176_FAIL_CHECKSUM
 

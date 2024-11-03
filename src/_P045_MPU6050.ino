@@ -111,6 +111,8 @@ boolean Plugin_045(uint8_t function, struct EventStruct *event, String& string)
         // The default sensorType of the device is a single sensor value. But for detection movement we want it to be
         // a switch so we change the sensortype here.
         event->sensorType = Sensor_VType::SENSOR_TYPE_SWITCH;
+      } else if (1 == PCONFIG_LONG(3)) {
+        event->sensorType = Sensor_VType::SENSOR_TYPE_TRIPLE;
       } else {
         event->sensorType = Sensor_VType::SENSOR_TYPE_SINGLE;
       }

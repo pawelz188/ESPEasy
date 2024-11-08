@@ -186,9 +186,10 @@ private:
   ESPeasySerial *_serial = nullptr;
 
   # if P176_HANDLE_CHECKSUM
-  uint32_t _checksumErrors = 0;
-  uint32_t _checksumDelta  = 0;
-  uint32_t _successCounter = 0;
+  uint32_t _checksumErrors     = 0;
+  uint32_t _checksumDelta      = 0;
+  uint32_t _successCounter     = 0;
+  uint32_t _lastSuccessCounter = 0;
   # endif // if P176_HANDLE_CHECKSUM
   int               _baud         = P176_DEFAULT_BAUDRATE;
   unsigned int      _serialBuffer = P176_DEFAULT_BUFFER;

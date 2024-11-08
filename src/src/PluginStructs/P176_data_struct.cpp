@@ -151,6 +151,23 @@ bool P176_data_struct::plugin_get_config_value(struct EventStruct *event,
     const String key = parseString(string, 1, '.'); // Decimal point as separator, by convention
     VictronValue value;
 
+    # if P176_HANDLE_CHECKSUM
+
+    if (equals(key, F("successcount"))) {
+      string  = _successCounter;
+      success = true;
+    } else
+    if (equals(key, F("ischanged"))) {
+      string              = _successCounter != _lastSuccessCounter;
+      _lastSuccessCounter = _successCounter;
+      success             = true;
+    } else
+    if (equals(key, F("errorcount"))) {
+      string  = _checksumErrors;
+      success = true;
+    } else
+    # endif // if P176_HANDLE_CHECKSUM
+
     if (getReceivedValue(key, value)) {
       string  = value.getValue();
       success = true;

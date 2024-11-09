@@ -186,7 +186,7 @@ When using VS-Code with WSL2, the VS-Code editor application runs on Windows, an
 Installing WSL2
 ---------------
 
-For installing WSL2 a couple of steps are needed. Assumption here is that the default Linux distribution for WSL is used, currently Ubuntu (24.04 LTS), using apt-get as the package manager. Other Linux distributions may use a different package manager, like dnf, zypper or yum, using somewhat different commands. Those commands are not documented here.
+For installing WSL2 the following steps are needed. Assumption here is that the default Linux distribution for WSL is used, currently Ubuntu (24.04 LTS), using apt-get as the package manager. Other Linux distributions may use a different package manager, like dnf, zypper or yum, using somewhat different commands. Those commands are not documented here.
 
 Install WSL2 - The Windows part
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -219,9 +219,9 @@ Additionally some tools need to be installed so PlatformIO can be properly insta
 
 .. code-block::
     
-    sudo apt-get install python3-venv
-    sudo apt-get install python3-pip
-    sudo apt-get install uncrustify
+    sudo apt-get install python3-venv python3-pip uncrustify
+
+NB: When running an older release of Ubuntu, like 2022.04 LTS, then uncrustify needs to be install/updated manually with a newer version, as the distributed version isn't working correctly. Or your Ubuntu install could be upgraded to 2024.04 (or newer) to correct this issue.
 
 Once this is completed, you can get the ESPEasy code in your WSL Linux file system. By default your Linux instance has access to the same internet connection as the host-computer that's running WSL, so the commands are the same as below for cloning a repository (**Clone your forked repositoryto your computer**)
 

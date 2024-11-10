@@ -77,6 +77,7 @@
 
 
 #ifdef USE_RTOS_MULTITASKING
+
 void RTOS_TaskServers(void *parameter)
 {
   while (true) {
@@ -112,7 +113,6 @@ void RTOS_HandleSchedule(void *parameter)
 }
 
 #endif // ifdef USE_RTOS_MULTITASKING
-
 
 /*********************************************************************************************\
 * ISR call back function for handling the watchdog.
@@ -161,10 +161,15 @@ void ESPEasy_setup()
     #  endif // if ESP_IDF_VERSION_MAJOR < 5
 
     if (pkg_version <= 7) { // D0WD, S0WD, D2WD
+#ifdef CORE32SOLO1
+      gpio_num_t PSRAM_CLK = GPIO_NUM_17;
+      gpio_num_t PSRAM_CS  = GPIO_NUM_16;
+#else
       gpio_num_t PSRAM_CLK = static_cast<gpio_num_t>(CONFIG_D0WD_PSRAM_CLK_IO);
       gpio_num_t PSRAM_CS  = static_cast<gpio_num_t>(CONFIG_D0WD_PSRAM_CS_IO);
 
-      switch (pkg_version) {
+      switch (pkg_version)
+      {
         case EFUSE_RD_CHIP_VER_PKG_ESP32D2WDQ5:
           PSRAM_CLK = static_cast<gpio_num_t>(CONFIG_D2WD_PSRAM_CLK_IO);
           PSRAM_CS  = static_cast<gpio_num_t>(CONFIG_D2WD_PSRAM_CS_IO);
@@ -175,7 +180,7 @@ void ESPEasy_setup()
           PSRAM_CS  = static_cast<gpio_num_t>(CONFIG_PICO_PSRAM_CS_IO);
           break;
       }
-
+#endif
 #  if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 2, 0)
 
       // Thanks Theo Arends from Tasmota
@@ -363,7 +368,7 @@ void ESPEasy_setup()
     .min_freq_mhz = Settings.EcoPowerMode() ? getCPU_MinFreqMHz() : getCPU_MaxFreqMHz(),
 # if CONFIG_FREERTOS_USE_TICKLESS_IDLE
     .light_sleep_enable = Settings.EcoPowerMode()
-# else // if CONFIG_FREERTOS_USE_TICKLESS_IDLE
+# else
     .light_sleep_enable = false
 # endif // if CONFIG_FREERTOS_USE_TICKLESS_IDLE
   };
@@ -518,7 +523,7 @@ void ESPEasy_setup()
   NPluginInit();
   # ifndef BUILD_NO_RAM_TRACKER
   logMemUsageAfter(F("NPluginInit()"));
-  # endif // ifndef BUILD_NO_RAM_TRACKER
+  # endif
   #endif // if FEATURE_NOTIFIER
 
   PluginInit();
@@ -527,7 +532,7 @@ void ESPEasy_setup()
 
   #ifndef BUILD_NO_RAM_TRACKER
   logMemUsageAfter(F("PluginInit()"));
-  #endif // ifndef BUILD_NO_RAM_TRACKER
+  #endif
 
   if (loglevelActiveFor(LOG_LEVEL_INFO)) {
     String log;
@@ -620,7 +625,7 @@ void ESPEasy_setup()
   ArduinoOTAInit();
   # ifndef BUILD_NO_RAM_TRACKER
   logMemUsageAfter(F("ArduinoOTAInit()"));
-  # endif // ifndef BUILD_NO_RAM_TRACKER
+  # endif
   #endif // if FEATURE_ARDUINO_OTA
 
   if (node_time.systemTimePresent()) {

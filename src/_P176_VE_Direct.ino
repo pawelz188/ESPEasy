@@ -6,6 +6,7 @@
 // #######################################################################################################
 
 /** Changelog:
+ * 2024-11-10 tonhuisman: Renamed GetConfig ischanged to updated.
  * 2024-11-08 tonhuisman: Add successcount, errorcount and ischanged values for GetConfig. IsChanged will reset the state on each call, so
  *                        should be called only once in a session.
  * 2024-10-30 tonhuisman: Accept ON/On and OFF/Off as 1 and 0 numeric values, to be able to use them as Values in the device configuration

@@ -157,7 +157,7 @@ bool P176_data_struct::plugin_get_config_value(struct EventStruct *event,
       string  = _successCounter;
       success = true;
     } else
-    if (equals(key, F("ischanged"))) {
+    if (equals(key, F("updated"))) {
       string              = _successCounter != _lastSuccessCounter;
       _lastSuccessCounter = _successCounter;
       success             = true;

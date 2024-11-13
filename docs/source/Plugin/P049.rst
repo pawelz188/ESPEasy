@@ -28,10 +28,10 @@ Supported hardware
 
 .. ..|P049_usedby|
 
-MHZ-19B,
-MHZ-19C,
-MHZ-19D,
-MHZ-19E
+MH-Z19B,
+MH-Z19C,
+MH-Z19D,
+MH-Z19E
 
 Sensor
 ^^^^^^

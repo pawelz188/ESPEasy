@@ -26,7 +26,12 @@ Used libraries: |P049_usedlibraries|
 Supported hardware
 ------------------
 
-|P049_usedby|
+.. ..|P049_usedby|
+
+MHZ-19B,
+MHZ-19C,
+MHZ-19D,
+MHZ-19E
 
 Sensor
 ^^^^^^

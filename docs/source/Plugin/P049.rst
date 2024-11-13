@@ -34,12 +34,16 @@ Sensor
 See: :ref:`SerialHelper_page`
 
 
+Commands available
+^^^^^^^^^^^^^^^^^^
+
+.. include:: P049_commands.repl
+
+Additional infos can be found here: https://emariete.com/en/sensor-co2-mh-z19b/
+
+
+
 **TODO**: Complete this documentation...
-
-.. Commands available
-.. ^^^^^^^^^^^^^^^^^^
-
-.. .. include:: P049_commands.repl
 
 .. Events
 .. ~~~~~~

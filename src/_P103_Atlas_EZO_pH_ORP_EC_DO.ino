@@ -186,7 +186,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
           }
         }
 
-        if (bType > -1) {
+        if ((bType > -1) && (bType / 4 < NR_ELEMENTS(boardIDs))) {
           board_type = boardIDs[bType / 4];
           board      = toString(board_type);
         }
@@ -241,7 +241,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
       memset(boarddata, 0, ATLAS_EZO_RETURN_ARRAY_SIZE); // Cleanup
 
       if (P103_send_I2C_command(P103_I2C_ADDRESS, F("Status"), boarddata) || P103_UNCONNECTED_SETUP) {
-        String boardStatus(boarddata);
+        const String boardStatus(boarddata);
 
         addRowLabel(F("Board status"));
         addHtml(boardStatus);
@@ -326,7 +326,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
         memset(boarddata, 0, ATLAS_EZO_RETURN_ARRAY_SIZE); // Cleanup
 
         if (P103_send_I2C_command(P103_I2C_ADDRESS, F("K,?"), boarddata)) {
-          String ecProbeType(boarddata);
+          const String ecProbeType(boarddata);
 
           addFormTextBox(F("EC Probe Type"), F("ec_probe_type"), parseStringKeepCase(ecProbeType, 2), 32);
           addFormCheckBox(F("Set Probe Type"), F("en_set_probe_type"), false);
@@ -385,12 +385,13 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
           (AtlasEZO_Sensors_e::EC == board_type)) {
         // Clear calibration option, only when using calibration
         P103_addClearCalibration();
-      }
 
-      // Temperature compensation
-      if ((AtlasEZO_Sensors_e::PH == board_type) ||
-          (AtlasEZO_Sensors_e::ORP == board_type) ||
-          (AtlasEZO_Sensors_e::EC == board_type)) {
+        // }
+
+        // Temperature compensation
+        // if ((AtlasEZO_Sensors_e::PH == board_type) ||
+        //     (AtlasEZO_Sensors_e::ORP == board_type) ||
+        //     (AtlasEZO_Sensors_e::EC == board_type)) {
         ESPEASY_RULES_FLOAT_TYPE value{};
 
         addFormSubHeader(F("Temperature compensation"));
@@ -411,8 +412,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
         String deviceTemperatureTemplateString(deviceTemperatureTemplate);
         const String pooltempString(parseTemplate(deviceTemperatureTemplateString));
 
-        if (Calculate(pooltempString, value) != CalculateReturnCode::OK)
-        {
+        if (Calculate(pooltempString, value) != CalculateReturnCode::OK) {
           addFormNote(F("Formula parse error. Using fixed value!"));
           value = P103_FIXED_TEMP_VALUE;
         }
@@ -421,7 +421,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
       }
 
       if (AtlasEZO_Sensors_e::HUM == board_type) {
-        addFormSubHeader(F("EZO-HUM Options"));
+        addFormSubHeader(F("HUM Options"));
         addFormCheckBox(F("Enable Temperature reading"), F("hum_temp"), _HUMhasTemp);
         addFormCheckBox(F("Enable Dew point reading"),   F("hum_dew"),  _HUMhasTemp);
       }

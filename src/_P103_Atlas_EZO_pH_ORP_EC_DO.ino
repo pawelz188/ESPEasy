@@ -186,7 +186,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
           }
         }
 
-        if ((bType > -1) && (bType / 4 < NR_ELEMENTS(boardIDs))) {
+        if ((bType > -1) && ((size_t)(bType / 4) < NR_ELEMENTS(boardIDs))) {
           board_type = boardIDs[bType / 4];
           board      = toString(board_type);
         }

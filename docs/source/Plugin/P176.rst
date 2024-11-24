@@ -49,6 +49,8 @@ Device Settings
 
 * **Ignore data on checksum error**: The protocol includes a checksum calculation, and when this fails, the data is probably unreliable, and should better be dismissed.
 
+* **Events only on updated data**: With this checkbox enabled, events and outgoing data to Controllers is only sent if at least 1 new packet is received since the last Interval or TaskRun. When disabled, data is sent out every Interval, when data is available (so at least a single packet is successfully received). This option is only available if Checksum processing is included in the build.
+
 Led
 ^^^
 

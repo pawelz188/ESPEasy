@@ -6,6 +6,8 @@
 // #######################################################################################################
 
 /** Changelog:
+ * 2024-11-24 tonhuisman: Add setting "Events only on updated data" to not generate events/Controller output if no new packets have been received
+ *                        This check is independent from the Updated GetConfig value.
  * 2024-11-10 tonhuisman: Renamed GetConfig ischanged to updated.
  * 2024-11-08 tonhuisman: Add successcount, errorcount and ischanged values for GetConfig. IsChanged will reset the state on each call, so
  *                        should be called only once in a session.
@@ -118,7 +120,7 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
     case PLUGIN_WEBFORM_LOAD:
     {
       addFormNumericBox(F("Baud Rate"), F("pbaud"), P176_SERIAL_BAUDRATE, 0);
-      uint8_t serialConfChoice = serialHelper_convertOldSerialConfig(P176_SERIAL_CONFIG);
+      const uint8_t serialConfChoice = serialHelper_convertOldSerialConfig(P176_SERIAL_CONFIG);
       serialHelper_serialconfig_webformLoad(event, serialConfChoice);
 
       addFormNumericBox(F("RX buffersize"), F("pbuffer"), P176_SERIAL_BUFFER, 128, 2048);
@@ -127,6 +129,9 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       # if P176_FAIL_CHECKSUM
       addFormCheckBox(F("Ignore data on checksum error"), F("pchksm"), P176_GET_FAIL_CHECKSUM);
       # endif // if P176_FAIL_CHECKSUM
+      # if P176_HANDLE_CHECKSUM
+      addFormCheckBox(F("Events only on updated data"),   F("pupd"),   P176_GET_READ_UPDATED);
+      # endif // if P176_HANDLE_CHECKSUM
 
       { // Led settings
         addFormSubHeader(F("Led"));
@@ -170,6 +175,9 @@ boolean Plugin_176(uint8_t function, struct EventStruct *event, String& string)
       # if P176_FAIL_CHECKSUM
       P176_SET_FAIL_CHECKSUM(isFormItemChecked(F("pchksm")));
       # endif // if P176_FAIL_CHECKSUM
+      # if P176_HANDLE_CHECKSUM
+      P176_SET_READ_UPDATED(isFormItemChecked(F("pupd")));
+      # endif // if P176_HANDLE_CHECKSUM
       # if P176_DEBUG
       P176_SET_DEBUG_LOG(isFormItemChecked(F("pdebug")));
       # endif // if P176_DEBUG

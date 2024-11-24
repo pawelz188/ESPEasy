@@ -21,6 +21,7 @@
 # define P176_FLAG_FAIL_CHECKSUM        9  // 1 bit
 # define P176_FLAG_DEBUG_LOG            10 // 1 bit
 # define P176_FLAG_LOG_QUIET            11 // 1 bit
+# define P176_FLAG_READ_UPDATED         12 // 1 bit
 # define P176_GET_LED_PIN    get8BitFromUL(P176_FLAGS, P176_FLAG_LED_PIN)
 # define P176_SET_LED_PIN(N) set8BitToUL(P176_FLAGS, P176_FLAG_LED_PIN, N)
 # define P176_GET_LED_INVERTED    bitRead(P176_FLAGS, P176_FLAG_LED_INVERTED)
@@ -29,6 +30,10 @@
 #  define P176_GET_FAIL_CHECKSUM    bitRead(P176_FLAGS, P176_FLAG_FAIL_CHECKSUM)
 #  define P176_SET_FAIL_CHECKSUM(N) bitWrite(P176_FLAGS, P176_FLAG_FAIL_CHECKSUM, N)
 # endif // if P176_FAIL_CHECKSUM
+# if P176_HANDLE_CHECKSUM
+#  define P176_GET_READ_UPDATED    bitRead(P176_FLAGS, P176_FLAG_READ_UPDATED)
+#  define P176_SET_READ_UPDATED(N) bitWrite(P176_FLAGS, P176_FLAG_READ_UPDATED, N)
+# endif // if P176_HANDLE_CHECKSUM
 # if P176_DEBUG
 #  define P176_GET_DEBUG_LOG    bitRead(P176_FLAGS, P176_FLAG_DEBUG_LOG)
 #  define P176_SET_DEBUG_LOG(N) bitWrite(P176_FLAGS, P176_FLAG_DEBUG_LOG, N)
@@ -190,6 +195,8 @@ private:
   uint32_t _checksumDelta      = 0;
   uint32_t _successCounter     = 0;
   uint32_t _lastSuccessCounter = 0;
+  uint32_t _lastReadCounter    = 0;
+  bool     _readUpdated        = false;
   # endif // if P176_HANDLE_CHECKSUM
   int               _baud         = P176_DEFAULT_BAUDRATE;
   unsigned int      _serialBuffer = P176_DEFAULT_BUFFER;

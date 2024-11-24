@@ -19,6 +19,9 @@ P176_data_struct::P176_data_struct(struct EventStruct *event) {
   # if P176_HANDLE_CHECKSUM && P176_FAIL_CHECKSUM
   _failChecksum = P176_GET_FAIL_CHECKSUM;
   # endif // if P176_HANDLE_CHECKSUM && P176_FAIL_CHECKSUM
+  # if P176_HANDLE_CHECKSUM
+  _readUpdated = P176_GET_READ_UPDATED;
+  # endif // if P176_HANDLE_CHECKSUM
   # if P176_DEBUG
   _debugLog = P176_GET_DEBUG_LOG;
   # endif // if P176_DEBUG
@@ -71,6 +74,15 @@ bool P176_data_struct::plugin_read(struct EventStruct *event) {
         success = true;
       }
     }
+    # if P176_HANDLE_CHECKSUM
+
+    if (success && (!_readUpdated || (_readUpdated &&
+                                      (_successCounter > 0) && (_successCounter != _lastReadCounter)))) {
+      _lastReadCounter = _successCounter;
+    } else {
+      success = false;
+    }
+    # endif // if P176_HANDLE_CHECKSUM
   }
 
   return success;

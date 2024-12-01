@@ -42,9 +42,9 @@ bool CPlugin_002(CPlugin::Function function, struct EventStruct *event, String& 
       proto.usesExtCreds = true;
       proto.defaultPort  = 1883;
       proto.usesID       = true;
-      #if FEATURE_MQTT_TLS
-      proto.usesTLS      = true;
-      #endif
+      # if FEATURE_MQTT_TLS
+      proto.usesTLS = true;
+      # endif // if FEATURE_MQTT_TLS
       break;
     }
 
@@ -108,12 +108,12 @@ bool CPlugin_002(CPlugin::Function function, struct EventStruct *event, String& 
               bool   mustSendEvent = false;
 
               switch (Settings.getPluginID_for_task(x).value) {
-                case 1:                                             // temp solution, if input switch, update state
+                case 1: // temp solution, if input switch, update state
                 {
-                  action = strformat(F("gpio,%u,%.2f"), x, nvalue); // FIXME tonhuisman: Was: InputSwitchState
+                  action = strformat(F("gpio,%d,%d"), Settings.TaskDevicePin1[x], static_cast<int>(nvalue));
                   break;
                 }
-                case 29:                                            // temp solution, if plugin 029, set gpio
+                case 29: // temp solution, if plugin 029, set gpio
                 {
                   if (switchtype.equalsIgnoreCase(F("dimmer")))
                   {

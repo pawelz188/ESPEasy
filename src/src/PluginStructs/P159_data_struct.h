@@ -59,7 +59,7 @@
 # define P159_DELAY_RESTART                       2500  // milliseconds to 'wait' (ignore) after a device-restart
 # define P159_DELAY_SENDOUT                       100   // Minimal milliseconds between sending data/events
 
-# define P159_MAX_SENSITIVITY_VALUE               110   // Max sensitivity 0 = most sensitive, 100 = least sensitive (docs)
+# define P159_MAX_SENSITIVITY_VALUE               101   // Max sensitivity 0 = most sensitive, 101 = no output (max = 100) (docs)
 # define P159_GATE_DISTANCE_METERS                0.75f // Size of each gate in meters (0.75f)
 
 enum class P159_state_e : uint8_t {

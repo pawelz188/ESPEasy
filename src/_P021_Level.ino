@@ -44,13 +44,13 @@
 # endif // ifndef/else BUILD_NO_DEBUG
 
 // See note at top of file
-#ifdef LIMIT_BUILD_SIZE
-#define FEATURE_P021_EXTRAS  0
-#define P021_MIN_BUILD_SIZE
-#undef PLUGIN_021_DEBUG
-#else // ifdef LIMIT_BUILD_SIZE
-#define FEATURE_P021_EXTRAS  1
-#endif // ifdef LIMIT_BUILD_SIZE
+# ifdef LIMIT_BUILD_SIZE
+# define FEATURE_P021_EXTRAS  0
+# define P021_MIN_BUILD_SIZE
+# undef PLUGIN_021_DEBUG
+# else // ifdef LIMIT_BUILD_SIZE
+# define FEATURE_P021_EXTRAS  1
+# endif // ifdef LIMIT_BUILD_SIZE
 
 # define PLUGIN_021
 # define PLUGIN_ID_021          21

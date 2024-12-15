@@ -188,7 +188,8 @@ void MQTT_execute_command(String& cmd,
 bool MQTT_protocol_send(EventStruct *event,
                         String       pubname,
                         bool         retainFlag) {
-  bool success = false;
+  bool success                = false;
+  const bool contains_valname = pubname.indexOf(F("%valname%")) != -1;
 
   parseControllerVariables(pubname, event, false);
 
@@ -200,7 +201,10 @@ bool MQTT_protocol_send(EventStruct *event,
       continue; // we skip values with empty labels
     }
     String tmppubname = pubname;
-    parseSingleControllerVariable(tmppubname, event, x, false);
+
+    if (contains_valname) {
+      parseSingleControllerVariable(tmppubname, event, x, false);
+    }
     String value;
 
     if (event->sensorType == Sensor_VType::SENSOR_TYPE_STRING) {

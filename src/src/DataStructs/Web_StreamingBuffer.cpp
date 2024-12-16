@@ -222,7 +222,9 @@ void Web_StreamingBuffer::startStream(bool allowOriginAll,
   buf.clear();
   buf.reserve(CHUNKED_BUFFER_SIZE);
   web_server.client().setNoDelay(true);
+#ifdef ESP32
   web_server.client().setSSE(false);
+#endif
   
   if (beforeTXRam < 3000) {
     lowMemorySkip = true;

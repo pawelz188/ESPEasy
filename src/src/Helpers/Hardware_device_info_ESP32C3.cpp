@@ -20,6 +20,28 @@
   # define EFUSE_FLASH_CAP_S  27
 
 
+/** EFUSE_VDD_SPI_AS_GPIO : RO; bitpos: [26]; default: 0;
+ *  Set this bit to vdd spi pin function as gpio.
+ *  register: EFUSE_RD_REPEAT_ERR0_REG
+ */
+# define EFUSE_VDD_SPI_AS_GPIO    (BIT(26))
+# define EFUSE_VDD_SPI_AS_GPIO_M  (EFUSE_VDD_SPI_AS_GPIO_V << EFUSE_VDD_SPI_AS_GPIO_S)
+# define EFUSE_VDD_SPI_AS_GPIO_V  0x00000001U
+# define EFUSE_VDD_SPI_AS_GPIO_S  26
+
+bool isFlashInterfacePin_ESPEasy(int gpio) {
+  // GPIO-11: Flash voltage selector
+  // GPIO-12 ... 17: Connected to flash
+  return (gpio) >= 12 && (gpio) <= 17;
+}
+
+bool flashVddPinCanBeUsedAsGPIO()
+{
+  const bool efuse_vdd_spi_as_gpio = REG_GET_FIELD(EFUSE_RD_REPEAT_ERR0_REG, EFUSE_VDD_SPI_AS_GPIO) != 0;
+
+  return efuse_vdd_spi_as_gpio;
+}
+
 int32_t getEmbeddedFlashSize()
 {
   const uint32_t flash_cap = REG_GET_FIELD(EFUSE_RD_MAC_SPI_SYS_3_REG, EFUSE_FLASH_CAP);
@@ -41,4 +63,11 @@ int32_t getEmbeddedPSRAMSize()
   // Doesn't have PSRAM
   return 0;
 }
-#endif
+
+# ifndef isPSRAMInterfacePin
+bool isPSRAMInterfacePin(int gpio) {
+  return false;
+}
+
+# endif // ifndef isPSRAMInterfacePin
+#endif // ifdef ESP32C3

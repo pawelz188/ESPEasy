@@ -2,7 +2,7 @@
 
 #ifdef ESP32S3
 
-// See: 
+// See:
 // - https://github.com/espressif/esptool/blob/master/esptool/targets/esp32s3.py
 // - https://github.com/tasmota/esp-idf/blob/206ce4b7f875bf5568ba47aba23f4b28e81b0574/components/efuse/esp32s3/esp_efuse_table.csv#L203-L208
   # include <soc/soc.h>
@@ -10,7 +10,8 @@
   # include <soc/spi_reg.h>
   # include <soc/rtc.h>
 
-// Flash data lines: https://github.com/tasmota/esp-idf/blob/206ce4b7f875bf5568ba47aba23f4b28e81b0574/components/efuse/esp32s3/esp_efuse_table.csv#L175
+// Flash data lines:
+// https://github.com/tasmota/esp-idf/blob/206ce4b7f875bf5568ba47aba23f4b28e81b0574/components/efuse/esp32s3/esp_efuse_table.csv#L175
 
 /** EFUSE_FLASH_CAP : R; bitpos: [29:27]; default: 0;
  * register: EFUSE_RD_MAC_SPI_SYS_3_REG
@@ -39,8 +40,12 @@
       case 4: features += F("(TT)"); break;
       case 5: features += F("(BY)"); break;
     }
-    */
-
+ */
+bool isFlashInterfacePin_ESPEasy(int gpio) {
+  // GPIO-26 ... 32: SPI flash and PSRAM
+  // GPIO-33 ... 37: SPI 8 ­line mode (OPI) pins for flash or PSRAM, like ESP32-S3R8 / ESP32-S3R8V.
+  return (gpio) >= 26 && (gpio) <= 32;
+}
 
 int32_t getEmbeddedFlashSize()
 {
@@ -79,9 +84,7 @@ int32_t getEmbeddedFlashSize()
       case 1: features += F("(AP_3v3)"); break;
       case 2: features += F("(AP_1v8)"); break;
     }
-*/
-
-
+ */
 int32_t getEmbeddedPSRAMSize()
 {
   const uint32_t psram_cap = REG_GET_FIELD(EFUSE_RD_MAC_SPI_SYS_4_REG, EFUSE_PSRAM_CAP);
@@ -95,5 +98,16 @@ int32_t getEmbeddedPSRAMSize()
   // Unknown value, thus mark as negative value
   return -1 * static_cast<int32_t>(psram_cap);
 }
+
+# ifndef isPSRAMInterfacePin
+bool isPSRAMInterfacePin(int gpio) {
+  // GPIO-26 ... 32: SPI flash and PSRAM
+  // GPIO-33 ... 37: SPI 8 ­line mode (OPI) pins for flash or PSRAM, like ESP32-S3R8 / ESP32-S3R8V.
+  // See Appendix A, page 71: https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_en.pdf
+  return FoundPSRAM() ? ((gpio) >= 33 && (gpio) <= 37) : false;
+}
+
+# endif // ifndef isPSRAMInterfacePin
+
 
 #endif // ifdef ESP32S3

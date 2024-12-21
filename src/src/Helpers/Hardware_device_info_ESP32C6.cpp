@@ -7,6 +7,28 @@
 # include <soc/spi_reg.h>
 # include <soc/rtc.h>
 
+bool isFlashInterfacePin_ESPEasy(int gpio) {
+  // FIXME TD-er: Must know whether we have internal or external flash
+
+  // For chip variants with an in-package flash, this pin can not be used.
+  if ((gpio == 10) || (gpio == 11)) {
+    return true;
+  }
+
+  // For chip variants without an in-package flash, this pin can not be used.
+  //  if (gpio == 14)
+  //    return true;
+
+  // GPIO-27: Flash voltage selector
+  // GPIO-24 ... 30: Connected to internal flash (might be available when using external flash???)
+  return (gpio) >= 24 && (gpio) <= 30 && gpio != 27;
+}
+
+bool flashVddPinCanBeUsedAsGPIO()
+{
+  return false;
+}
+
 int32_t getEmbeddedFlashSize()
 {
   // See: framework-arduinoespressif32\tools\esp32-arduino-libs\esp32c6\include\soc\esp32c6\include\soc\efuse_reg.h
@@ -30,4 +52,12 @@ int32_t getEmbeddedPSRAMSize()
   // Doesn't have PSRAM
   return 0;
 }
-#endif
+
+# ifndef isPSRAMInterfacePin
+bool isPSRAMInterfacePin(int gpio) {
+  return false;
+}
+
+# endif // ifndef isPSRAMInterfacePin
+
+#endif // ifdef ESP32C6

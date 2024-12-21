@@ -123,102 +123,6 @@ int32_t getPartitionInfo(ESP8266_partition_type ptype, uint32_t& address, int32_
 #endif // ifdef ESP8266
 
 
-bool isFlashInterfacePin_ESPEasy(int gpio) {
-#if CONFIG_IDF_TARGET_ESP32
-
-  if (getChipFeatures().embeddedFlash ||
-      getChipFeatures().embeddedPSRAM) {
-
-    // See page 20: https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf
-    if (getChipFeatures().embeddedFlash) {
-      //  ESP32-U4WDH In-Package Flash (4 MB)
-      //  SD_DATA_1   IO0/DI      (GPIO-8)
-      //  GPIO17      IO1/DO      (GPIO-17)
-      //  SD_DATA_0   IO2/WP#     (GPIO-7)
-      //  SD_CMD      IO3/HOLD#   (GPIO-11)
-      //  SD_CLK      CLK         (GPIO-6)
-      //  GPIO16      CS#         (GPIO-16)
-      //  GND         VSS
-      //  VDD_SDIO1   VDD
-
-      if (gpio >= 6 && gpio <= 8) return true;
-      if (gpio == 17 || gpio == 11 || gpio == 16) return true;
-    }
-
-    if (getChipFeatures().embeddedPSRAM) {
-      //  ESP32-D0WDR2-V3 In-Package PSRAM (2 MB)
-      //  SD_DATA_1       SIO0/SI (GPIO-8)
-      //  SD_DATA_0       SIO1/SO (GPIO-7)
-      //  SD_DATA_3       SIO2    (GPIO-10)
-      //  SD_DATA_2       SIO3    (GPIO-9)
-      //  SD_CLK          SCLK    (GPIO-6)
-      //  GPIO16          CE#     (GPIO-16)
-      //  GND             VSS
-      //  VDD_SDIO1       VDD
-      if (gpio >= 6 && gpio <= 10) return true;
-      if (gpio == 16) return true;
-
-    }
-    return false;
-  }
-
-
-  // GPIO-6 ... 11: SPI flash and PSRAM
-  // GPIO-16 & 17: CS for PSRAM, thus only unuable when PSRAM is present
-  return (gpio) >= 6 && (gpio) <= 11;
-
-#elif CONFIG_IDF_TARGET_ESP32S3
-
-  // GPIO-26 ... 32: SPI flash and PSRAM
-  // GPIO-33 ... 37: SPI 8 ­line mode (OPI) pins for flash or PSRAM, like ESP32-S3R8 / ESP32-S3R8V.
-  return (gpio) >= 26 && (gpio) <= 32;
-
-#elif CONFIG_IDF_TARGET_ESP32S2
-
-  // GPIO-22 ... 25: SPI flash and PSRAM
-  // GPIO-26: CS for PSRAM, thus only unuable when PSRAM is present
-  // GPIO-27 ... 32: SPI 8 ­line mode (OPI) pins for flash or PSRAM (e.g. ESP32-S2FH2 and ESP32-S2FH4)
-  return (gpio) >= 22 && (gpio) <= 25;
-
-#elif CONFIG_IDF_TARGET_ESP32C6
-
-  // FIXME TD-er: Must know whether we have internal or external flash
-
-  // For chip variants with an in-package flash, this pin can not be used.
-  if ((gpio == 10) || (gpio == 11)) {
-    return true;
-  }
-
-  // For chip variants without an in-package flash, this pin can not be used.
-  //  if (gpio == 14)
-  //    return true;
-
-  // GPIO-27: Flash voltage selector
-  // GPIO-24 ... 30: Connected to internal flash (might be available when using external flash???)
-  return (gpio) >= 24 && (gpio) <= 30 && gpio != 27;
-
-#elif CONFIG_IDF_TARGET_ESP32C3
-
-  // GPIO-11: Flash voltage selector
-  // GPIO-12 ... 17: Connected to flash
-  return (gpio) >= 12 && (gpio) <= 17;
-
-#elif CONFIG_IDF_TARGET_ESP32C2
-
-  // GPIO-11: Flash voltage selector
-  // For chip variants with a SiP flash built in, GPIO11~ GPIO17 are dedicated to connecting SiP flash, not for other uses
-  return (gpio) >= 12 && (gpio) <= 17;
-
-#elif defined(ESP8266)
-
-  if (isESP8285()) {
-    return (gpio) == 6 || (gpio) == 7 || (gpio) == 8 || (gpio) == 11;
-  }
-  return (gpio) >= 6 && (gpio) <= 11;
-
-#endif // if CONFIG_IDF_TARGET_ESP32
-}
-
 uint32_t getFlashChipId() {
   // Cache since size does not change
   static uint32_t flashChipId = 0;
@@ -274,6 +178,13 @@ esp32_chip_features getChipFeatures() {
     res.bluetooth_classic = chip_info.features & CHIP_FEATURE_BT;
     res.ieee_802_15_4     = chip_info.features & CHIP_FEATURE_IEEE802154;
     res.embeddedPSRAM     = chip_info.features & CHIP_FEATURE_EMB_PSRAM;
+
+    if (!res.embeddedFlash) {
+        const int32_t flash_cap = getEmbeddedFlashSize();
+        if (flash_cap > 0) {
+          res.embeddedFlash = true;
+        }
+    }
 
     loaded = true;
   }
@@ -967,40 +878,5 @@ bool CanUsePSRAM() {
 # endif // if CONFIG_IDF_TARGET_ESP32
   return true;
 }
-
-# ifndef isPSRAMInterfacePin
-bool isPSRAMInterfacePin(int gpio) {
-#  if CONFIG_IDF_TARGET_ESP32
-
-  // GPIO-6 ... 11: SPI flash and PSRAM
-  // GPIO-16 & 17: CS for PSRAM, thus only unuable when PSRAM is present
-  return FoundPSRAM() ? ((gpio) == 16 || (gpio) == 17) : false;
-
-#  elif CONFIG_IDF_TARGET_ESP32S2
-
-  // GPIO-22 ... 25: SPI flash and PSRAM
-  // GPIO-26: CS for PSRAM, thus only unuable when PSRAM is present
-  // GPIO-27 ... 32: SPI 8 ­line mode (OPI) pins for flash or PSRAM (e.g. ESP32-S2FH2 and ESP32-S2FH4)
-  // GPIO-27 ... 32: are never made accessible
-  return FoundPSRAM() ? ((gpio) >= 26 && (gpio) <= 32) : false;
-
-#  elif CONFIG_IDF_TARGET_ESP32S3
-
-  // GPIO-26 ... 32: SPI flash and PSRAM
-  // GPIO-33 ... 37: SPI 8 ­line mode (OPI) pins for flash or PSRAM, like ESP32-S3R8 / ESP32-S3R8V.
-  // See Appendix A, page 71: https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_en.pdf
-  return FoundPSRAM() ? ((gpio) >= 33 && (gpio) <= 37) : false;
-
-#  elif CONFIG_IDF_TARGET_ESP32C3
-
-  // GPIO-11: Flash voltage selector
-  // GPIO-12 ... 17: Connected to flash
-  return false;
-
-#  endif // if CONFIG_IDF_TARGET_ESP32
-  return false;
-}
-
-# endif // ifndef isPSRAMInterfacePin
 
 #endif  // ESP32

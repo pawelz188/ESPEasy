@@ -52,6 +52,8 @@ struct esp32_chip_features {
 esp32_chip_features        getChipFeatures();
 String                     getChipFeaturesString();
 
+bool                      flashVddPinCanBeUsedAsGPIO();
+
 int32_t                   getEmbeddedFlashSize();
 int32_t                   getEmbeddedPSRAMSize();
 

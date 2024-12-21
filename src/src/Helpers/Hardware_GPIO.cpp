@@ -168,7 +168,7 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
   }
 
   if (gpio == 11) {
-    if (getChipFeatures().embeddedFlash) {
+    if (getChipFeatures().embeddedFlash /* || !flashVddPinCanBeUsedAsGPIO() */) {
       // See: https://www.letscontrolit.com/forum/viewtopic.php?p=71880#p71874
       //
       // By default VDD_SPI is the power supply pin for embedded flash or external flash. 

@@ -10,8 +10,8 @@
   # include <soc/rtc.h>
 
 
-// Flash datalines: https://github.com/tasmota/esp-idf/blob/206ce4b7f875bf5568ba47aba23f4b28e81b0574/components/efuse/esp32s2/esp_efuse_table.csv#L155
-
+// Flash datalines:
+// https://github.com/tasmota/esp-idf/blob/206ce4b7f875bf5568ba47aba23f4b28e81b0574/components/efuse/esp32s2/esp_efuse_table.csv#L155
 
 
 /** EFUSE_FLASH_CAP : R; bitpos: [24:21]; default: 0;
@@ -22,6 +22,17 @@
   # define EFUSE_FLASH_CAP_V  0x0000000FU
   # define EFUSE_FLASH_CAP_S  21
 
+bool isFlashInterfacePin_ESPEasy(int gpio) {
+  // GPIO-22 ... 25: SPI flash and PSRAM
+  // GPIO-26: CS for PSRAM, thus only unuable when PSRAM is present
+  // GPIO-27 ... 32: SPI 8 ­line mode (OPI) pins for flash or PSRAM (e.g. ESP32-S2FH2 and ESP32-S2FH4)
+  return (gpio) >= 22 && (gpio) <= 25;
+}
+
+bool flashVddPinCanBeUsedAsGPIO()
+{
+  return false;
+}
 
 int32_t getEmbeddedFlashSize()
 {
@@ -59,5 +70,16 @@ int32_t getEmbeddedPSRAMSize()
   return -1 * static_cast<int32_t>(psram_cap);
 }
 
+# ifndef isPSRAMInterfacePin
+bool isPSRAMInterfacePin(int gpio) {
+  // GPIO-22 ... 25: SPI flash and PSRAM
+  // GPIO-26: CS for PSRAM, thus only unuable when PSRAM is present
+  // GPIO-27 ... 32: SPI 8 ­line mode (OPI) pins for flash or PSRAM (e.g. ESP32-S2FH2 and ESP32-S2FH4)
+  // GPIO-27 ... 32: are never made accessible
+  return FoundPSRAM() ? ((gpio) >= 26 && (gpio) <= 32) : false;
+}
 
-#endif
+# endif // ifndef isPSRAMInterfacePin
+
+
+#endif // ifdef ESP32S2

@@ -77,6 +77,15 @@ uint8_t                    getChipCores();
 
 const __FlashStringHelper* getChipModel();
 
+#ifdef ESP32
+const __FlashStringHelper* getChipModel(
+  uint32_t chip_model, 
+  uint32_t chip_revision, 
+  uint32_t pkg_version, 
+  bool single_core);
+#endif
+
+
 bool                       isESP8285(uint32_t& pkg_version, bool& high_temp_version);
 bool                       isESP8285();
 

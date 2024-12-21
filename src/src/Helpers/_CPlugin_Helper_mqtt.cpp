@@ -191,8 +191,6 @@ bool MQTT_protocol_send(EventStruct *event,
   bool success                = false;
   const bool contains_valname = pubname.indexOf(F("%valname%")) != -1;
 
-  parseControllerVariables(pubname, event, false);
-
   const uint8_t valueCount = getValueCountForTask(event->TaskIndex);
 
   for (uint8_t x = 0; x < valueCount; ++x) {
@@ -205,6 +203,7 @@ bool MQTT_protocol_send(EventStruct *event,
     if (contains_valname) {
       parseSingleControllerVariable(tmppubname, event, x, false);
     }
+    parseControllerVariables(tmppubname, event, false);
     String value;
 
     if (event->sensorType == Sensor_VType::SENSOR_TYPE_STRING) {
@@ -212,12 +211,12 @@ bool MQTT_protocol_send(EventStruct *event,
     } else {
       value = formatUserVarNoCheck(event, x);
     }
-        # ifndef BUILD_NO_DEBUG
+    # ifndef BUILD_NO_DEBUG
 
     if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
       addLog(LOG_LEVEL_DEBUG, strformat(F("MQTT C%03d : %s %s"), event->ControllerIndex, tmppubname.c_str(), value.c_str()));
     }
-        # endif // ifndef BUILD_NO_DEBUG
+    # endif // ifndef BUILD_NO_DEBUG
 
     // Small optimization so we don't try to copy potentially large strings
     if (event->sensorType == Sensor_VType::SENSOR_TYPE_STRING) {
@@ -235,5 +234,336 @@ bool MQTT_protocol_send(EventStruct *event,
   }
   return success;
 }
+
+# if FEATURE_MQTT_DISCOVER
+
+bool MQTT_SendAutoDiscovery(controllerIndex_t ControllerIndex, cpluginID_t CPluginID) {
+  bool success = true;
+
+  MakeControllerSettings(ControllerSettings); // -V522
+
+  if (!AllocatedControllerSettings()) {
+    return false;
+  }
+  LoadControllerSettings(ControllerIndex, *ControllerSettings);
+
+  if (ControllerSettings->mqtt_autoDiscovery()
+
+      // && (ControllerSettings->MqttAutoDiscoveryTrigger[0] != 0)
+      && (ControllerSettings->MqttAutoDiscoveryTopic[0] != 0)) {
+    // Dispatch autoDiscovery per supported method
+    switch (CPluginID) {
+      case 5: // CPLUGIN_ID_005
+        success = MQTT_HomeAssistant_SendAutoDiscovery(ControllerIndex, *ControllerSettings);
+        break;
+    }
+
+    //
+  }
+
+  return success;
+}
+
+/********************************************************
+ * Send MQTT AutoDiscovery in Home Assistant format
+ *******************************************************/
+bool MQTT_HomeAssistant_SendAutoDiscovery(controllerIndex_t         ControllerIndex,
+                                          ControllerSettingsStruct& ControllerSettings) {
+  String discoveryMessage;
+
+  discoveryMessage.reserve(128);
+
+  // TODO Send global info
+
+  // TODO Send plugin info
+  for (taskIndex_t x = 0; x < TASKS_MAX; ++x) {
+    const pluginID_t pluginID = Settings.getPluginID_for_task(x);
+
+    if (validPluginID_fullcheck(pluginID)) {
+      LoadTaskSettings(x);
+      const deviceIndex_t DeviceIndex = getDeviceIndex_from_TaskIndex(x);
+
+
+      // Device is enabled so send information
+      if (validDeviceIndex(DeviceIndex) &&
+          Settings.TaskDeviceEnabled[x] &&                // task enabled?
+          Settings.TaskDeviceSendData[ControllerIndex][x] // selected for this controller?
+          ) {
+        const String deviceName = getTaskDeviceName(x);
+        std::vector<DiscoveryItem> discoveryItems;
+        int valueCount = getValueCountForTask(x);
+
+        // Translate Device[].VType to usable VType per value for MQTT AutoDiscovery
+        if (MQTT_DiscoveryGetDeviceVType(DeviceIndex, x, discoveryItems, valueCount)) {
+          for (size_t s = 0; s < discoveryItems.size(); ++s) {
+            String tmp;
+            String base_topic(ControllerSettings.MqttAutoDiscoveryTopic);
+            String valuename;
+            struct EventStruct TempEvent(x); // FIXME Check if this has enough data
+
+            switch (discoveryItems[s].VType) {
+              // VType values to support, mapped to device classes:
+              case Sensor_VType::SENSOR_TYPE_SWITCH:
+
+                for (uint8_t v = 0; v < discoveryItems[s].valueCount; ++v) {
+                  String tmppubname = base_topic;
+                  parseSingleControllerVariable(tmppubname, &TempEvent, v, false);
+                  parseDeviceClassVariable(tmppubname, F("switch"), false);
+                  parseControllerVariables(tmppubname, &TempEvent, false); // Replace this last
+                  tmp += strformat(F("{\"~\":\"%s\",\"name\":%s,\"cmd_t\":\"~/set\",\"stat_t\":\"~/%s\"},"),
+                                   tmppubname.c_str(), deviceName.c_str(), getTaskValueName(x, v).c_str());
+                }
+                discoveryMessage += tmp;
+                break;
+              case Sensor_VType::SENSOR_TYPE_TEMP_HUM:
+              case Sensor_VType::SENSOR_TYPE_TEMP_BARO:
+              case Sensor_VType::SENSOR_TYPE_TEMP_HUM_BARO:
+              case Sensor_VType::SENSOR_TYPE_TEMP_EMPTY_BARO:
+              case Sensor_VType::SENSOR_TYPE_WIND:
+              case Sensor_VType::SENSOR_TYPE_ANALOG_ONLY:
+              case Sensor_VType::SENSOR_TYPE_TEMP_ONLY:
+              case Sensor_VType::SENSOR_TYPE_HUM_ONLY:
+              case Sensor_VType::SENSOR_TYPE_LUX_ONLY:
+              case Sensor_VType::SENSOR_TYPE_DISTANCE_ONLY:
+              case Sensor_VType::SENSOR_TYPE_DIRECTION_ONLY:
+              case Sensor_VType::SENSOR_TYPE_DUSTPM2_5_ONLY:
+              case Sensor_VType::SENSOR_TYPE_DUSTPM1_0_ONLY:
+              case Sensor_VType::SENSOR_TYPE_DUSTPM10_ONLY:
+              case Sensor_VType::SENSOR_TYPE_MOISTURE_ONLY:
+              case Sensor_VType::SENSOR_TYPE_CO2_ONLY:
+              case Sensor_VType::SENSOR_TYPE_GPS_ONLY:
+              case Sensor_VType::SENSOR_TYPE_UV_ONLY:
+              case Sensor_VType::SENSOR_TYPE_UV_INDEX_ONLY:
+              case Sensor_VType::SENSOR_TYPE_IR_ONLY:
+                break;
+
+              // VType values to ignore
+              case Sensor_VType::SENSOR_TYPE_NONE:
+              case Sensor_VType::SENSOR_TYPE_SINGLE:
+              case Sensor_VType::SENSOR_TYPE_DUAL:
+              case Sensor_VType::SENSOR_TYPE_TRIPLE:
+              case Sensor_VType::SENSOR_TYPE_QUAD:
+              case Sensor_VType::SENSOR_TYPE_DIMMER:
+              case Sensor_VType::SENSOR_TYPE_STRING:
+              case Sensor_VType::SENSOR_TYPE_ULONG:
+              #  if FEATURE_EXTENDED_TASK_VALUE_TYPES
+              case Sensor_VType::SENSOR_TYPE_UINT32_DUAL:
+              case Sensor_VType::SENSOR_TYPE_UINT32_TRIPLE:
+              case Sensor_VType::SENSOR_TYPE_UINT32_QUAD:
+              case Sensor_VType::SENSOR_TYPE_INT32_SINGLE:
+              case Sensor_VType::SENSOR_TYPE_INT32_DUAL:
+              case Sensor_VType::SENSOR_TYPE_INT32_TRIPLE:
+              case Sensor_VType::SENSOR_TYPE_INT32_QUAD:
+              case Sensor_VType::SENSOR_TYPE_UINT64_SINGLE:
+              case Sensor_VType::SENSOR_TYPE_UINT64_DUAL:
+              case Sensor_VType::SENSOR_TYPE_INT64_SINGLE:
+              case Sensor_VType::SENSOR_TYPE_INT64_DUAL:
+              case Sensor_VType::SENSOR_TYPE_DOUBLE_SINGLE:
+              case Sensor_VType::SENSOR_TYPE_DOUBLE_DUAL:
+              #  endif // if FEATURE_EXTENDED_TASK_VALUE_TYPES
+              case Sensor_VType::SENSOR_TYPE_NOT_SET:
+                break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // TODO Send discovery message
+  return false;
+}
+
+bool MQTT_DiscoveryGetDeviceVType(deviceIndex_t             DeviceIndex,
+                                  taskIndex_t               TaskIndex,
+                                  std::vector<DiscoveryItem>discoveryItems,
+                                  int                       valueCount) {
+  size_t orgLen      = discoveryItems.size();
+  Sensor_VType VType = Device[DeviceIndex].VType;
+
+  // For those plugin IDs that don't have an explicitly set VType, or the wrong VType set
+  switch (Device[DeviceIndex].Number) {
+    case 2:   // Analog input
+    case 7:   // PCF8591
+    case 25:  // ADS1x15
+    case 60:  // MCP3221
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_ANALOG_ONLY, valueCount, 0));
+      break;
+    case 4:   // Dallas temperature sensors
+    case 24:  // MLX90614
+    case 39:  // SPI Thermosensors
+    case 69:  // LM75A
+    case 150: // TMP117
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_TEMP_ONLY, valueCount, 0));
+      break;
+    case 10:  // BH1750
+    case 168: // VEML6030/VEML7700
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, valueCount, 0));
+      break;
+    case 13:  // HCSR04
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DISTANCE_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_SWITCH, 1, 1));
+      break;
+    case 14: // SI70xx
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_TEMP_HUM, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_ANALOG_ONLY, 1, 2));
+      break;
+    case 15: // TSL2561 Only Lux / IR / Broadband values made available
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_IR_ONLY, 1, 1));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 1, 2));
+      break;
+    case 18:  // GP2Y10
+    case 144: // Vindriktning / PM1006K
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DUSTPM2_5_ONLY, valueCount, 0));
+      break;
+    case 47:  // Soil Moisture
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_TEMP_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_MOISTURE_ONLY, 1, 1));
+
+      if (valueCount == 3) {
+        discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 1, 2));
+      }
+      break;
+    case 49: // MHZ19
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_CO2_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_TEMP_ONLY, 1, 1));
+      break;
+    case 53:  // PMSx003
+    case 175: // PMSx003i (I2C)
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DUSTPM1_0_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DUSTPM2_5_ONLY, 1, 1));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DUSTPM10_ONLY, 1, 2));
+      break;
+    case 56: // SDS011
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DUSTPM2_5_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DUSTPM10_ONLY, 1, 1));
+      break;
+    case 74: // TSL2591
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 3, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_ONLY, 1, 3));
+      break;
+    case 84: // VEML6070 (UV and Index only)
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_INDEX_ONLY, 1, 1));
+      break;
+    case 106: // BME68x
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_TEMP_HUM_BARO, valueCount, 0));
+      break;
+    case 107: // SI1145
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_IR_ONLY, 1, 1));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_ONLY, 1, 2));
+      break;
+    case 110: // VL53L0X
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DISTANCE_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DIRECTION_ONLY, 1, 1));
+      break;
+    case 113: // VL53L1X
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DISTANCE_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 1, 1));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DIRECTION_ONLY, 1, 2));
+      break;
+    case 114: // VEML6075
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_ONLY, 2, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_INDEX_ONLY, 1, 2));
+      break;
+    case 127: // CDM7160
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_CO2_ONLY, valueCount, 0));
+      break;
+    case 133: // LTR390
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_UV_INDEX_ONLY, 1, 1));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_LUX_ONLY, 2, 2));
+      break;
+    case 134: // A02YYUW
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_DISTANCE_ONLY, valueCount, 0));
+      break;
+    case 135: // SCD4x
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_CO2_ONLY, 1, 0));
+      discoveryItems.push_back(DiscoveryItem(Sensor_VType::SENSOR_TYPE_TEMP_HUM, 1, 1));
+      break;
+
+    // Deliberately ignored/skipped for now:
+    case 3:  // Pulse: Needs special handling/not usable?
+    case 26: // Sysinfo: Needs special handling/not usable?
+    case 33: // Dummy: Needs special handling/not usable?
+    case 61: // Keypad: Not a switch
+    case 62: // Touch Keypad: Not a switch
+    case 63: // Touch Keypad: Not a switch
+      // Reset
+      VType = Sensor_VType::SENSOR_TYPE_NONE;
+      break;
+
+    // To be reviewed/considered later:
+    case 8:   // RFID Wiegand
+    case 17:  // RFID PN532
+    case 27:  // INA219
+    case 40:  // RFID ID12
+    case 45:  // MPU6050
+    case 50:  // TCS34725 RGB: Needs special handling
+    case 52:  // SensAir: Needs special handling
+    case 64:  // APDS9960: Needs special handling
+    case 66:  // VEML6040 RGB: Needs special handling
+    case 67:  // HX711 Load cell
+    case 71:  // Kamstrup Heat
+    case 76:  // HLW8012
+    case 77:  // CSE7766
+    case 78:  // Eastron: Needs special handling
+    case 82:  // GPS: Needs special handling
+    case 83:  // SGP30 TVOC/eCO2
+    case 85:  // AcuDC243
+    case 90:  // CCS811 TVOC/eCO2
+    case 92:  // DL-bus
+    case 93:  // Mitsubishi Heatpump
+    case 102: // PZEM004
+    case 103: // Atlas EZO
+    case 108: // DDS238
+    case 111: // RFID RC522
+    case 112: // AS7265x: Needs special handling
+    case 115: // MAX1704x
+    case 117: // SCD30 CO2: Needs special handling
+    case 132: // INA3221
+    case 142: // AS5600 Angle/rotation
+    case 145: // MQxxx gases
+    case 147: // SGP4x
+    case 151: // Honeywell pressure
+    case 159: // LD2410
+    case 163: // RadSens
+    case 164: // ENS160
+    case 167: // Vindstyrka: Needs special handling
+    case 169: // AS3935 Lightning
+      // Reset
+      VType = Sensor_VType::SENSOR_TYPE_NONE;
+      break;
+  }
+
+  // Use Device VType setting if not overridden or reset
+  if ((Sensor_VType::SENSOR_TYPE_NONE != VType) && (discoveryItems.size() == 0)) {
+    discoveryItems.push_back(DiscoveryItem(VType, valueCount, 0));
+  }
+  struct EventStruct TempEvent(TaskIndex);
+  String dummy;
+
+  // Get value VTypes from plugin
+  if (PluginCall(PLUGIN_GET_DISCOVERY_VTYPES, &TempEvent, dummy)) {
+    uint8_t maxVar = VARS_PER_TASK;
+    discoveryItems.clear();        // Plugin can override, clear any defaults acquired earlier
+
+    for (; maxVar > 0; --maxVar) { // Only include minimal used values
+      if (TempEvent.ParN[maxVar - 1] != 0) {
+        break;
+      }
+    }
+
+    for (uint8_t v = 0; v < maxVar; ++v) {
+      discoveryItems.push_back(DiscoveryItem(static_cast<Sensor_VType>(TempEvent.ParN[v]), 1, v));
+    }
+  }
+
+  return orgLen != discoveryItems.size(); // Something added?
+}
+
+# endif // if FEATURE_MQTT_DISCOVER
 
 #endif // if FEATURE_MQTT

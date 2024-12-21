@@ -56,8 +56,3 @@ bool isSerialConsolePin(int gpio) {
 #endif // ifdef ESP32S2
 #endif
 }
-
-#ifdef ESP32
-
-
-#endif // ifdef ESP32

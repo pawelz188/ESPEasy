@@ -1420,7 +1420,7 @@ Basic Math Functions
 * ``round(x)`` Rounds to the nearest integer, but rounds halfway cases away from zero (instead of to the nearest even integer). 
 * ``^`` The caret is used as the exponentiation operator for calculating the value of x to the power of y (x\ :sup:`y`). 
 
-* ``map(x,lowFrom,highFrom,lowTo,highTo)`` Maps value x in the lowFrom/highFrom range to lowTo/highTo values. Uses the Arduino map() function. Uses Integer values only! See examples below.
+* ``map(value,fromLow,fromHigh,toLow,toHigh)`` Maps value x in the fromLow/fromHigh range to toLow/toHigh values. Uses the Arduino map() function. Uses Integer values only! See examples below.
 
 Rules example:
 

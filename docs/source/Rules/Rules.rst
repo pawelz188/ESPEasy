@@ -1420,6 +1420,8 @@ Basic Math Functions
 * ``round(x)`` Rounds to the nearest integer, but rounds halfway cases away from zero (instead of to the nearest even integer). 
 * ``^`` The caret is used as the exponentiation operator for calculating the value of x to the power of y (x\ :sup:`y`). 
 
+* ``map(x,lowFrom,highFrom,lowTo,highTo)`` Maps value x in the lowFrom/highFrom range to lowTo/highTo values. Uses the Arduino map() function. Uses Integer values only! See examples below.
+
 Rules example:
 
 .. code-block:: none  
@@ -1454,6 +1456,24 @@ Called with event ``eventname2=1.234,100``
  213379 : Info   : ACT : LogEntry,'pow of 1.234^100 = 1353679866.79107'
  213382 : Info   : pow of 1.234^100 = 1353679866.79107
 
+Examples using the ``map()`` function. Map does not constrain the values withing the given range, but uses extrapolation when the input value goes outside the ``lowFrom`` / ``highFrom`` range.
+
+Missing values for the map function default to 0.
+
+.. code-block:: none
+
+ on ds1#temp do
+   let,1,%eventvalue1|20% // use default of 20 degrees
+   let,2,map(%v2%,-10,40,1,60) // Convert a temperature range -10..40 to a 60 pixel LED stripe
+   NeoPixelLine,1,%v2%,255,255,255 // Draw a white line on the LED strip
+ endon
+
+.. code-block:: none
+
+ on eventname3 do
+   let,1,map(%eventvalue1|10%,0,100,100,0) // Reverse mapping of a value, 0..100 will output 100..0
+   LogEntry,'Input value %eventvalue1|10% mapped to: %v1%'
+ endon
 
 
 Trigonometric Functions

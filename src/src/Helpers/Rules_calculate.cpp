@@ -479,8 +479,8 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
         ++sl;
       }
 
-      // Process current token at a comma
-      else if (c == ',')
+      // Process the token at a colon (separator)
+      else if (c == ':')
       {
         *(TokenPos) = 0; // Mark end of token string
         error       = RPNCalculate(token);

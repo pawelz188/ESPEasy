@@ -1420,7 +1420,7 @@ Basic Math Functions
 * ``round(x)`` Rounds to the nearest integer, but rounds halfway cases away from zero (instead of to the nearest even integer). 
 * ``^`` The caret is used as the exponentiation operator for calculating the value of x to the power of y (x\ :sup:`y`). 
 
-* ``map(value,fromLow,fromHigh,toLow,toHigh)`` Maps value x in the fromLow/fromHigh range to toLow/toHigh values. Uses the Arduino map() function. Uses Integer values only! See examples below.
+* ``map(value:fromLow:fromHigh:toLow:toHigh)`` Maps value x in the fromLow/fromHigh range to toLow/toHigh values. Uses the Arduino map() function. Uses Integer values only! See examples below. (Using a colon as an argument separator to not interfere with regular argument processing)
 
 Rules example:
 
@@ -1464,14 +1464,14 @@ Missing values for the map function default to 0.
 
  on ds1#temp do
    let,1,%eventvalue1|20% // use default of 20 degrees
-   let,2,"map(%v2%,-10,40,1,60)"" // Convert a temperature range -10..40 to a 60 pixel LED stripe, needs quotes for the commas
+   let,2,map(%v2%:-10:40:1:60) // Convert a temperature range -10..40 to a 60 pixel LED stripe
    NeoPixelLine,1,%v2%,255,255,255 // Draw a white line on the LED strip
  endon
 
 .. code-block:: none
 
  on eventname3 do
-   let,1,'map(%eventvalue1|10%,0,100,100,0)'' // Reverse mapping of a value, 0..100 will output 100..0
+   let,1,map(%eventvalue1|10%:0:100:100:0) // Reverse mapping of a value, 0..100 will output 100..0
    LogEntry,'Input value %eventvalue1|10% mapped to: %v1%'
  endon
 

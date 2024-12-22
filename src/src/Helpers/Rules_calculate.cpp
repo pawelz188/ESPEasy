@@ -4,6 +4,7 @@
 #include "../ESPEasyCore/ESPEasy_Log.h"
 #include "../Globals/RamTracker.h"
 #include "../Helpers/ESPEasy_math.h"
+#include "../Helpers/Hardware.h"
 #include "../Helpers/Numerical.h"
 #include "../Helpers/StringConverter.h"
 
@@ -280,7 +281,7 @@ ESPEASY_RULES_FLOAT_TYPE RulesCalculate_t::apply_quinary_operator(char op,
   const UnaryOperator qu_op = static_cast<UnaryOperator>(op);
 
   if (UnaryOperator::Map == qu_op) {
-    return map(first, second, third, fourth, fifth);
+    return mapADCtoFloat(first, second, third, fourth, fifth);
   }
   return ret;
 }

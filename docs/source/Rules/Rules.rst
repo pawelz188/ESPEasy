@@ -1420,7 +1420,7 @@ Basic Math Functions
 * ``round(x)`` Rounds to the nearest integer, but rounds halfway cases away from zero (instead of to the nearest even integer). 
 * ``^`` The caret is used as the exponentiation operator for calculating the value of x to the power of y (x\ :sup:`y`). 
 
-* ``map(value:fromLow:fromHigh:toLow:toHigh)`` Maps value x in the fromLow/fromHigh range to toLow/toHigh values. Uses the Arduino map() function. Uses Integer values only! See examples below. (Using a colon as an argument separator to not interfere with regular argument processing)
+* ``map(value:fromLow:fromHigh:toLow:toHigh)`` Maps value x in the fromLow/fromHigh range to toLow/toHigh values. Similar to the Arduino map() function. See examples below. (Using a colon as an argument separator to not interfere with regular argument processing)
 
 Rules example:
 
@@ -1456,7 +1456,7 @@ Called with event ``eventname2=1.234,100``
  213379 : Info   : ACT : LogEntry,'pow of 1.234^100 = 1353679866.79107'
  213382 : Info   : pow of 1.234^100 = 1353679866.79107
 
-Examples using the ``map()`` function. Map does not constrain the values withing the given range, but uses extrapolation when the input value goes outside the ``lowFrom`` / ``highFrom`` range.
+Examples using the ``map()`` function. Map does not constrain the values within the given range, but uses extrapolation when the input value goes outside the ``fromLow`` / ``fromHigh`` range.
 
 Missing values for the map function default to 0.
 

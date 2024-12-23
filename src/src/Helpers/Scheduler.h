@@ -165,7 +165,7 @@ void                 setPluginTaskTimer(unsigned long msecFromNow,
   bool setRulesTimer(unsigned long msecFromNow,
                      unsigned int  timerIndex,
                      int           recurringCount = 0,
-                     bool          startImmedately = false);
+                     bool          startImmediately = false);
 
   void process_rules_timer(SchedulerTimerID timerID,
                            unsigned long lasttimer);

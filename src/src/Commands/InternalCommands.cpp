@@ -324,8 +324,8 @@ bool InternalCommands::executeInternalCommand()
     case ESPEasy_cmd_e::logentry:                   COMMAND_CASE_A(Command_logentry,               -1);      // Diagnostic.h
     case ESPEasy_cmd_e::looptimerset:               COMMAND_CASE_A(Command_Loop_Timer_Set,          3);      // Timers.h
     case ESPEasy_cmd_e::looptimerset_ms:            COMMAND_CASE_A(Command_Loop_Timer_Set_ms,       3);      // Timers.h
-    case ESPEasy_cmd_e::looptimersetandrun:            COMMAND_CASE_A(Command_Loop_Timer_SetAndRun,    3);      // Timers.h
-    case ESPEasy_cmd_e::looptimersetandrun_ms:         COMMAND_CASE_A(Command_Loop_Timer_SetAndRun_ms, 3);      // Timers.h
+    case ESPEasy_cmd_e::looptimersetandrun:         COMMAND_CASE_A(Command_Loop_Timer_SetAndRun,    3);      // Timers.h
+    case ESPEasy_cmd_e::looptimersetandrun_ms:      COMMAND_CASE_A(Command_Loop_Timer_SetAndRun_ms, 3);      // Timers.h
     case ESPEasy_cmd_e::longpulse:                  COMMAND_CASE_A(Command_GPIO_LongPulse,          5);      // GPIO.h
     case ESPEasy_cmd_e::longpulse_ms:               COMMAND_CASE_A(Command_GPIO_LongPulse_Ms,       5);      // GPIO.h
 #ifndef BUILD_NO_DIAGNOSTIC_COMMANDS

@@ -34,19 +34,11 @@ extern int lastADCvalue; // Keep track of last ADC value as it cannot be read wh
 int   espeasy_analogRead(int pin);
 #endif // ifdef ESP8266
 
-float mapADCtoFloat(float float_value,
-                    float adc1,
-                    float adc2,
-                    float out1,
-                    float out2);
-
-#if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-double mapADCtoFloat(double double_value,
-                     double adc1,
-                     double adc2,
-                     double out1,
-                     double out2);
-#endif // if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
+ESPEASY_RULES_FLOAT_TYPE mapADCtoFloat(ESPEASY_RULES_FLOAT_TYPE float_value,
+                                       ESPEASY_RULES_FLOAT_TYPE adc1,
+                                       ESPEASY_RULES_FLOAT_TYPE adc2,
+                                       ESPEASY_RULES_FLOAT_TYPE out1,
+                                       ESPEASY_RULES_FLOAT_TYPE out2);
 
 
 #ifdef ESP32

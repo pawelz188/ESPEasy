@@ -336,35 +336,19 @@ int espeasy_analogRead(int pin) {
 
 #endif // ifdef ESP8266
 
-float mapADCtoFloat(float float_value,
-                    float adc1,
-                    float adc2,
-                    float out1,
-                    float out2)
+ESPEASY_RULES_FLOAT_TYPE mapADCtoFloat(ESPEASY_RULES_FLOAT_TYPE float_value,
+                                       ESPEASY_RULES_FLOAT_TYPE adc1,
+                                       ESPEASY_RULES_FLOAT_TYPE adc2,
+                                       ESPEASY_RULES_FLOAT_TYPE out1,
+                                       ESPEASY_RULES_FLOAT_TYPE out2)
 {
   if (!approximatelyEqual(adc1, adc2))
   {
-    const float normalized = (float_value - adc1) / (adc2 - adc1);
+    const ESPEASY_RULES_FLOAT_TYPE normalized = (float_value - adc1) / (adc2 - adc1);
     float_value = normalized * (out2 - out1) + out1;
   }
   return float_value;
 }
-
-#if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-double mapADCtoFloat(double double_value,
-                     double adc1,
-                     double adc2,
-                     double out1,
-                     double out2)
-{
-  if (!approximatelyEqual(adc1, adc2))
-  {
-    const double normalized = (double_value - adc1) / (adc2 - adc1);
-    double_value = normalized * (out2 - out1) + out1;
-  }
-  return double_value;
-}
-#endif // #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 
 #ifdef ESP32
 

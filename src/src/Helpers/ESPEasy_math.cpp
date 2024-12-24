@@ -10,11 +10,11 @@
 #include <cmath>
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-constexpr double ESPEASY_DOUBLE_EPSILON     = ESPEASY_DOUBLE_EPSILON_FACTOR *  std::numeric_limits<double>::epsilon();
-constexpr double ESPEASY_DOUBLE_EPSILON_NEG = -1.0 * ESPEASY_DOUBLE_EPSILON_FACTOR *  std::numeric_limits<double>::epsilon();
+constexpr double ESPEASY_DOUBLE_EPSILON     = ESPEASY_DOUBLE_EPSILON_FACTOR * std::numeric_limits<double>::epsilon();
+constexpr double ESPEASY_DOUBLE_EPSILON_NEG = -1.0 * ESPEASY_DOUBLE_EPSILON_FACTOR * std::numeric_limits<double>::epsilon();
 #endif
-constexpr float  ESPEASY_FLOAT_EPSILON      = std::numeric_limits<float>::epsilon();
-constexpr float  ESPEASY_FLOAT_EPSILON_NEG  = -1.0f * std::numeric_limits<float>::epsilon();
+constexpr float  ESPEASY_FLOAT_EPSILON      = ESPEASY_FLOAT_EPSILON_FACTOR * std::numeric_limits<float>::epsilon();
+constexpr float  ESPEASY_FLOAT_EPSILON_NEG  = -1.0f * ESPEASY_FLOAT_EPSILON_FACTOR * std::numeric_limits<float>::epsilon();
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 int maxNrDecimals_fpType(const double& value)
@@ -99,7 +99,7 @@ bool definitelyGreaterThan(const float& a, const float& b) {
 bool definitelyGreaterThan(const double& a, const double& b, double epsilon)
 {
   #ifndef BUILD_NO_DEBUG
-  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan double a:%.1f b:%.1f ep:%.8g delta:%f"),
+  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan double a:%f b:%f ep:%.8g delta:%f"),
                                     a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
   #endif // ifndef BUILD_NO_DEBUG
   return (a - b) > epsilon;
@@ -108,6 +108,10 @@ bool definitelyGreaterThan(const double& a, const double& b, double epsilon)
 
 bool definitelyGreaterThan(const float& a, const float& b, float epsilon)
 {
+  #ifndef BUILD_NO_DEBUG
+  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan float a:%f b:%f ep:%.8g delta:%f"),
+                                    a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
+  #endif // ifndef BUILD_NO_DEBUG
   return (a - b) > epsilon;
 }
 
@@ -125,7 +129,7 @@ bool definitelyLessThan(const float& a, const float& b) {
 bool definitelyLessThan(const double& a, const double& b, double epsilon)
 {
   #ifndef BUILD_NO_DEBUG
-  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan double a:%.1f b:%.1f ep:%.8g delta:%f"),
+  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan double a:%f b:%f ep:%.8g delta:%f"),
                                     a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
   #endif // ifndef BUILD_NO_DEBUG
   return (b - a) > epsilon;
@@ -134,6 +138,10 @@ bool definitelyLessThan(const double& a, const double& b, double epsilon)
 
 bool definitelyLessThan(const float& a, const float& b, float epsilon)
 {
+  #ifndef BUILD_NO_DEBUG
+  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan float a:%f b:%f ep:%.8g delta:%f"),
+                                    a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
+  #endif // ifndef BUILD_NO_DEBUG
   return (b - a) > epsilon;
 }
 

@@ -1,7 +1,7 @@
 #include "../Helpers/ESPEasy_math.h"
 #ifndef BUILD_NO_DEBUG
 #include "../ESPEasyCore/ESPEasy_Log.h"
-#include "./StringConverter.h"
+#include "../Helpers/StringConverter.h"
 #endif // ifndef BUILD_NO_DEBUG
 
 #include <Arduino.h> 

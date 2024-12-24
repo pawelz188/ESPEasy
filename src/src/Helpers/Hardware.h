@@ -40,6 +40,14 @@ float mapADCtoFloat(float float_value,
                     float out1,
                     float out2);
 
+#if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
+double mapADCtoFloat(double double_value,
+                     double adc1,
+                     double adc2,
+                     double out1,
+                     double out2);
+#endif // if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
+
 
 #ifdef ESP32
 void  initADC();

@@ -530,8 +530,8 @@ static const char DATA_ESPEASY_DEFAULT_MIN_CSS[] PROGMEM = {
 // #define USES_P146   // Cache Reader
 // #define USES_P147   // SGP4x
 //   #define P147_FEATURE_GASINDEXALGORITHM    0 // Enabled by default, can be turned off here
-
 // #define USES_P148   // POWR3xxD/THR3xxD
+
 // #define USES_P150   // TMP117 Temperature
 // #define USES_P151   // Honeywell Pressure
 // #define USES_P152   // ESP32 DAC
@@ -543,13 +543,17 @@ static const char DATA_ESPEASY_DEFAULT_MIN_CSS[] PROGMEM = {
 // #define USES_P162   // Output - MCP42xxx Digipot
 // #define USES_P163   // Environment - RadSens I2C radiation counter
 // #define USES_P164   // Gases - ENS16x TVOC/eCO2
+// #define USES_P165   // Display - NeoPixel (7-segment)
 // #define USES_P166   // Output - GP8403 Dual channel DAC (Digital Analog Converter)
 // #define USES_P167   // Environment - Sensirion SEN5x / Ikea Vindstyrka
 // #define USES_P168   // Light - VEML6030/VEML7700
 // #define USES_P169   // Environment - AS3935 Lightning Detector
+
 // #define USES_P170   // Input - I2C Liquid level sensor
 // #define USES_P172   // BMP3xx SPI.
 // #define USES_P173   // Environment - SHTC3
+// #define USES_P175   // Dust - PMSx003i I2C
+// #define USES_P176   // Communication - Victron VE.Direct
 
 /*
  #######################################################################################################

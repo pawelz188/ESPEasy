@@ -164,6 +164,13 @@ String SystemVariables::getSystemVariable(SystemVariables::Enum enumval) {
     case BSSID:             return (WiFiEventData.WiFiDisconnected()) ? MAC_address().toString() : WiFi.BSSIDstr();
     case CR:                return String('\r');
     case IP4:               intvalue = static_cast<int>(NetworkLocalIP()[3]); break; // 4th IP octet
+    case ISVAR_DOUBLE:      intvalue =
+                            #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
+                            1;
+                            #else
+                            0;
+                            #endif
+                            break;
     case ISLIMITED_BUILD:   intvalue =
                             #ifdef LIMIT_BUILD_SIZE
                             1;
@@ -539,6 +546,7 @@ const __FlashStringHelper * SystemVariables::toFlashString(SystemVariables::Enum
 #if FEATURE_USE_IPV6
     case Enum::IP6_LOCAL:          return F("ipv6local");
 #endif
+    case Enum::ISVAR_DOUBLE:       return F("isvar_double");
     case Enum::ISLIMITED_BUILD:    return F("islimited_build");
     case Enum::ISMQTT:             return F("ismqtt");
     case Enum::ISMQTTIMP:          return F("ismqttimp");

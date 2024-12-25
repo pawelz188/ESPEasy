@@ -46,6 +46,7 @@ public:
 #if FEATURE_USE_IPV6
     IP6_LOCAL,
 #endif
+    ISVAR_DOUBLE,
     ISLIMITED_BUILD,
     ISMQTT,
     ISMQTTIMP,

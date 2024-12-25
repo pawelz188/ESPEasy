@@ -163,7 +163,7 @@ var AnythingElse = [
   "%sysmonth_0%", "%sysyear%", "%sysyear_0%", "%sysyears%", "%sysweekday%", "%sysweekday_s%", "%unixtime%", "%uptime%", "%uptime_ms%",
   "%rssi%", "%ip%", "%unit%", "%unit_0%", "%ssid%", "%bssid%", "%wi_ch%", "%iswifi%", "%vcc%", "%mac%", "%mac_int%", "%isntp%", "%ismqtt%",
   "%dns%", "%dns1%", "%dns2%", "%flash_freq%", "%flash_size%", "%flash_chip_vendor%", "%flash_chip_model%", "%fs_free%", "%fs_size%",
-  "%cpu_id%", "%cpu_freq%", "%cpu_model%", "%cpu_rev%", "%cpu_cores%", "%board_name%", "%inttemp%",
+  "%cpu_id%", "%cpu_freq%", "%cpu_model%", "%cpu_rev%", "%cpu_cores%", "%board_name%", "%inttemp%", "%islimited_build%",
   //String Functions
   "substring", "indexOf", "indexOf_ci", "equals", "equals_ci", "strtol", "timeToMin", "timeToSec",
   //Ethernet

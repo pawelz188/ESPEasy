@@ -127,7 +127,8 @@ void handle_sysvars() {
   # if FEATURE_INTERNAL_TEMPERATURE
       SystemVariables::INTERNAL_TEMPERATURE,
   # endif // if FEATURE_INTERNAL_TEMPERATURE
-      SystemVariables::BOOT_CAUSE
+      SystemVariables::BOOT_CAUSE,
+      SystemVariables::ISLIMITED_BUILD,
     };
     addSysVar_enum_html(vars, NR_ELEMENTS(vars));
   }

@@ -12,11 +12,10 @@ var commonCommands = ["AccessInfo", "Background", "Build", "ClearAccessBlock", "
   "UdpPort", "UdpTest", "Unit", "UseNTP", "WdConfig", "WdRead", "WiFi", "WiFiAllowAP", "WiFiAPMode", "WiFiConnect", "WiFiDisconnect", "WiFiKey",
   "WiFiKey2", "WiFiMode", "WiFiScan", "WiFiSSID", "WiFiSSID2", "WiFiSTAMode",
   "Event", "AsyncEvent",
-  "GPIO", "GPIOToggle", "LongPulse", "LongPulse_mS", "Monitor", "Pulse", "PWM", "Servo", "Status", "Tone", "RTTTL", "UnMonitor",
-  "Provision", "Provision,Config", "Provision,Security", "Provision,Notification", "Provision,Provision", "Provision,Rules,", "Provision,CustomCdnUrl", "Provision,Firmware,", ];
+  "GPIO", "GPIOToggle", "LongPulse", "LongPulse_mS", "Monitor", "Pulse", "PWM", "Servo", "Status", "Tone", "RTTTL", "UnMonitor",];
 var commonEvents = ["Clock#Time", "Login#Failed", "MQTT#Connected", "MQTT#Disconnected", "MQTTimport#Connected", "MQTTimport#Disconnected", "Rules#Timer", "System#Boot",
   "System#BootMode", "System#Sleep", "System#Wake", "TaskExit#", "TaskInit#", "ThingspeakReply", "Time#Initialized", "Time#Set", "WiFi#APmodeDisabled", "WiFi#APmodeEnabled",
-  "WiFi#ChangedAccesspoint", "WiFi#ChangedWiFichannel", "WiFi#Connected", "WiFi#Disconnected", "ProvisionFirmware",];
+  "WiFi#ChangedAccesspoint", "WiFi#ChangedWiFichannel", "WiFi#Connected", "WiFi#Disconnected"];
 var commonPlugins = [
   //P003
   "ResetPulseCounter", "SetPulseCounterTotal", "LogPulseStatistic",
@@ -125,10 +124,6 @@ var commonPlugins = [
   "gp8403", "gp8403,volt,", "gp8403,mvolt,", "gp8403,range,", "gp8403,preset,", "gp8403,init,",
   //P167
   "sen5x", "sen5x,startclean", "sen5x,techlog,",
-  //P169
-  "as3935", "as3935,clearstats", "as3935,calibrate", "as3935,setgain,", "as3935,setnf,", "as3935,setwd,", "as3925,setsrej,",
-  //P175
-  "pmsx003", "pmsx003,wake", "pmsx003,sleep", "pmsx003,reset",
 ];
 var pluginDispKind = [
   //P095

@@ -215,10 +215,10 @@
 
 #define FEATURE_PLUGIN_STATS  1    // Support collecting historic data + computing stats on historic data
 #ifdef ESP8266
-#  define PLUGIN_STATS_NR_ELEMENTS 16
+// #  define PLUGIN_STATS_NR_ELEMENTS 16
 #endif // ifdef ESP8266
 # ifdef ESP32
-#  define PLUGIN_STATS_NR_ELEMENTS 64
+// #  define PLUGIN_STATS_NR_ELEMENTS 64
 #endif // ifdef ESP32
 #define FEATURE_CHART_JS  1        // Support for drawing charts, like PluginStats historic data
 

@@ -127,8 +127,8 @@ var commonPlugins = [
   "sen5x", "sen5x,startclean", "sen5x,techlog,",
   //P169
   "as3935", "as3935,clearstats", "as3935,calibrate", "as3935,setgain,", "as3935,setnf,", "as3935,setwd,", "as3925,setsrej,",
-  //P175
-  "pmsx003", "pmsx003,wake", "pmsx003,sleep", "pmsx003,reset",
+  //P175(P053)
+  /*"pmsx003", "pmsx003,wake", "pmsx003,sleep", "pmsx003,reset",*/
 ];
 var pluginDispKind = [
   //P095

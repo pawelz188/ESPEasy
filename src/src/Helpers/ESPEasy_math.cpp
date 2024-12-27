@@ -99,8 +99,10 @@ bool definitelyGreaterThan(const float& a, const float& b) {
 bool definitelyGreaterThan(const double& a, const double& b, double epsilon)
 {
   #ifndef BUILD_NO_DEBUG
-  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan double a:%f b:%f ep:%.8g delta:%f"),
-                                    a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan double a:%f b:%f ep:%.8g"),
+                                      a, b, epsilon));
+  }
   #endif // ifndef BUILD_NO_DEBUG
   return (a - b) > epsilon;
 }
@@ -109,8 +111,10 @@ bool definitelyGreaterThan(const double& a, const double& b, double epsilon)
 bool definitelyGreaterThan(const float& a, const float& b, float epsilon)
 {
   #ifndef BUILD_NO_DEBUG
-  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan float a:%f b:%f ep:%.8g delta:%f"),
-                                    a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan float a:%f b:%f ep:%.8g"),
+                                      a, b, epsilon));
+  }
   #endif // ifndef BUILD_NO_DEBUG
   return (a - b) > epsilon;
 }
@@ -129,8 +133,10 @@ bool definitelyLessThan(const float& a, const float& b) {
 bool definitelyLessThan(const double& a, const double& b, double epsilon)
 {
   #ifndef BUILD_NO_DEBUG
-  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan double a:%f b:%f ep:%.8g delta:%f"),
-                                    a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan double a:%f b:%f ep:%.8g"),
+                                      a, b, epsilon));
+  }
   #endif // ifndef BUILD_NO_DEBUG
   return (b - a) > epsilon;
 }
@@ -139,8 +145,10 @@ bool definitelyLessThan(const double& a, const double& b, double epsilon)
 bool definitelyLessThan(const float& a, const float& b, float epsilon)
 {
   #ifndef BUILD_NO_DEBUG
-  addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan float a:%f b:%f ep:%.8g delta:%f"),
-                                    a, b, epsilon, ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon)));
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan float a:%f b:%f ep:%.8g"),
+                                      a, b, epsilon));
+  }
   #endif // ifndef BUILD_NO_DEBUG
   return (b - a) > epsilon;
 }

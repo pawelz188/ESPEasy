@@ -23,36 +23,36 @@ bool approximatelyEqual(const double& a, const double& b);
 #endif
 bool approximatelyEqual(const float& a, const float& b);
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool approximatelyEqual(const double& a, const double& b, double epsilon);
+bool approximatelyEqual(const double& a, const double& b, double estimatedEpsilon);
 #endif
-bool approximatelyEqual(const float& a, const float& b, float epsilon);
+bool approximatelyEqual(const float& a, const float& b, float estimatedEpsilon);
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 bool definitelyGreaterThan(const double& a, const double& b);
 #endif
 bool definitelyGreaterThan(const float& a, const float& b);
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool definitelyGreaterThan(const double& a, const double& b, double epsilon);
+bool definitelyGreaterThan(const double& a, const double& b, double estimatedEpsilon);
 #endif
-bool definitelyGreaterThan(const float& a, const float& b, float epsilon);
+bool definitelyGreaterThan(const float& a, const float& b, float estimatedEpsilon);
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 bool definitelyLessThan(const double& a, const double& b);
 #endif
 bool definitelyLessThan(const float& a, const float& b);
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool definitelyLessThan(const double& a, const double& b, double epsilon);
+bool definitelyLessThan(const double& a, const double& b, double estimatedEpsilon);
 #endif
-bool definitelyLessThan(const float& a, const float& b, float epsilon);
+bool definitelyLessThan(const float& a, const float& b, float estimatedEpsilon);
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 bool essentiallyEqual(const double& a, const double& b);
 #endif
 bool essentiallyEqual(const float& a, const float& b);
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool essentiallyEqual(const double& a, const double& b, double epsilon);
+bool essentiallyEqual(const double& a, const double& b, double estimatedEpsilon);
 #endif
-bool essentiallyEqual(const float& a, const float& b, float epsilon);
+bool essentiallyEqual(const float& a, const float& b, float estimatedEpsilon);
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 bool essentiallyZero(const double& a);

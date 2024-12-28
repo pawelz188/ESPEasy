@@ -332,3 +332,17 @@ double sqrt(const double x)
 
 
 #endif
+
+ESPEASY_RULES_FLOAT_TYPE mapADCtoFloat(ESPEASY_RULES_FLOAT_TYPE float_value,
+                                       ESPEASY_RULES_FLOAT_TYPE adc1,
+                                       ESPEASY_RULES_FLOAT_TYPE adc2,
+                                       ESPEASY_RULES_FLOAT_TYPE out1,
+                                       ESPEASY_RULES_FLOAT_TYPE out2)
+{
+  if (!approximatelyEqual(adc1, adc2))
+  {
+    const ESPEASY_RULES_FLOAT_TYPE normalized = (float_value - adc1) / (adc2 - adc1);
+    float_value = normalized * (out2 - out1) + out1;
+  }
+  return float_value;
+}

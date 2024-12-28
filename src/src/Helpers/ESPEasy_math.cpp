@@ -1,4 +1,9 @@
 #include "../Helpers/ESPEasy_math.h"
+#ifndef BUILD_NO_DEBUG
+#include "../ESPEasyCore/ESPEasy_Log.h"
+#include "../Helpers/StringConverter.h"
+#endif // ifndef BUILD_NO_DEBUG
+
 
 #include <Arduino.h> 
 // Need to include Arduino.h first, then cmath
@@ -70,15 +75,15 @@ bool approximatelyEqual(const float& a, const float& b) {
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool approximatelyEqual(const double& a, const double& b, double epsilon)
+bool approximatelyEqual(const double& a, const double& b, double estimatedEpsilon)
 {
-  return std::abs(a - b) <= ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  return std::abs(a - b) <= estimatedEpsilon;
 }
 #endif
 
-bool approximatelyEqual(const float& a, const float& b, float epsilon)
+bool approximatelyEqual(const float& a, const float& b, float estimatedEpsilon)
 {
-  return std::abs(a - b) <= ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  return std::abs(a - b) <= estimatedEpsilon;
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
@@ -92,15 +97,27 @@ bool definitelyGreaterThan(const float& a, const float& b) {
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool definitelyGreaterThan(const double& a, const double& b, double epsilon)
+bool definitelyGreaterThan(const double& a, const double& b, double estimatedEpsilon)
 {
-  return (a - b) > ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  #ifndef BUILD_NO_DEBUG
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan double a:%f b:%f ep:%.8g"),
+                                      a, b, estimatedEpsilon));
+  }
+  #endif // ifndef BUILD_NO_DEBUG
+  return (a - b) > estimatedEpsilon;
 }
 #endif
 
-bool definitelyGreaterThan(const float& a, const float& b, float epsilon)
+bool definitelyGreaterThan(const float& a, const float& b, float estimatedEpsilon)
 {
-  return (a - b) > ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  #ifndef BUILD_NO_DEBUG
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyGreaterThan float a:%f b:%f ep:%.8g"),
+                                      a, b, estimatedEpsilon));
+  }
+  #endif // ifndef BUILD_NO_DEBUG
+  return (a - b) > estimatedEpsilon;
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
@@ -114,15 +131,27 @@ bool definitelyLessThan(const float& a, const float& b) {
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool definitelyLessThan(const double& a, const double& b, double epsilon)
+bool definitelyLessThan(const double& a, const double& b, double estimatedEpsilon)
 {
-  return (b - a) > ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  #ifndef BUILD_NO_DEBUG
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan double a:%f b:%f ep:%.8g"),
+                                      a, b, estimatedEpsilon));
+  }
+  #endif // ifndef BUILD_NO_DEBUG
+  return (b - a) > estimatedEpsilon;
 }
 #endif
 
-bool definitelyLessThan(const float& a, const float& b, float epsilon)
+bool definitelyLessThan(const float& a, const float& b, float estimatedEpsilon)
 {
-  return (b - a) > ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  #ifndef BUILD_NO_DEBUG
+  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
+    addLog(LOG_LEVEL_DEBUG, strformat(F("definitelyLessThan float a:%f b:%f ep:%.8g"),
+                                      a, b, estimatedEpsilon));
+  }
+  #endif // ifndef BUILD_NO_DEBUG
+  return (b - a) > estimatedEpsilon;
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
@@ -136,15 +165,15 @@ bool essentiallyEqual(const float& a, const float& b) {
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-bool essentiallyEqual(const double& a, const double& b, double epsilon)
+bool essentiallyEqual(const double& a, const double& b, double estimatedEpsilon)
 {
-  return std::abs(a - b) <= ((std::abs(a) > std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  return std::abs(a - b) <= estimatedEpsilon;
 }
 #endif
 
-bool essentiallyEqual(const float& a, const float& b, float epsilon)
+bool essentiallyEqual(const float& a, const float& b, float estimatedEpsilon)
 {
-  return std::abs(a - b) <= ((std::abs(a) > std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+  return std::abs(a - b) <= estimatedEpsilon;
 }
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE

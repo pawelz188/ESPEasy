@@ -4,18 +4,17 @@
 #include "../Helpers/StringConverter.h"
 #endif // ifndef BUILD_NO_DEBUG
 
-
 #include <Arduino.h> 
 // Need to include Arduino.h first, then cmath
 // See: https://github.com/esp8266/Arduino/issues/8922#issuecomment-1542301697
 #include <cmath>
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
-constexpr double ESPEASY_DOUBLE_EPSILON     = ESPEASY_DOUBLE_EPSILON_FACTOR *  std::numeric_limits<double>::epsilon();
-constexpr double ESPEASY_DOUBLE_EPSILON_NEG = -1.0 * ESPEASY_DOUBLE_EPSILON_FACTOR *  std::numeric_limits<double>::epsilon();
+constexpr double ESPEASY_DOUBLE_EPSILON     = ESPEASY_DOUBLE_EPSILON_FACTOR * std::numeric_limits<double>::epsilon();
+constexpr double ESPEASY_DOUBLE_EPSILON_NEG = -1.0 * ESPEASY_DOUBLE_EPSILON_FACTOR * std::numeric_limits<double>::epsilon();
 #endif
-constexpr float  ESPEASY_FLOAT_EPSILON      = std::numeric_limits<float>::epsilon();
-constexpr float  ESPEASY_FLOAT_EPSILON_NEG  = -1.0f * std::numeric_limits<float>::epsilon();
+constexpr float  ESPEASY_FLOAT_EPSILON      = ESPEASY_FLOAT_EPSILON_FACTOR * std::numeric_limits<float>::epsilon();
+constexpr float  ESPEASY_FLOAT_EPSILON_NEG  = -1.0f * ESPEASY_FLOAT_EPSILON_FACTOR * std::numeric_limits<float>::epsilon();
 
 #if FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE
 int maxNrDecimals_fpType(const double& value)

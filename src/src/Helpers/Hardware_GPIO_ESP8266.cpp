@@ -13,8 +13,7 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
   input  = true;
   output = true;
 
-  // GPIO 0, 2 & 15 can't be used as an input. State during boot is dependent on boot mode.
-  warning = (gpio == 0 || gpio == 2 || gpio == 15);
+  warning = isBootStrapPin(gpio);
 
   switch (gpio) {
     case  0: pinnr =  3; break;
@@ -65,6 +64,11 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
     output = false;
   }
   return input || output;
+}
+
+bool isBootStrapPin(int gpio)
+{
+    return (gpio == 0 || gpio == 2 || gpio == 15);
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

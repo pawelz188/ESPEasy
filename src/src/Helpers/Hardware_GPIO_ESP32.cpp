@@ -15,7 +15,7 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
 
   input   = GPIO_IS_VALID_GPIO(gpio);
   output  = GPIO_IS_VALID_OUTPUT_GPIO(gpio);
-  warning = false;
+  warning = isBootStrapPin(gpio);
 
   if ((gpio < 0) || !(GPIO_IS_VALID_GPIO(gpio))) { return false; }
 
@@ -42,26 +42,6 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
     // Connected to the integrated SPI flash.
     input   = false;
     output  = false;
-    warning = true;
-  }
-
-  // GPIO 0 & 2 can't be used as an input. State during boot is dependent on boot mode.
-  if ((gpio == 0) || (gpio == 2)) {
-    warning = true;
-  }
-
-  if (gpio == 12) {
-    // If driven High, flash voltage (VDD_SDIO) is 1.8V not default 3.3V.
-    // Has internal pull-down, so unconnected = Low = 3.3V.
-    // May prevent flashing and/or booting if 3.3V flash is used and this pin is
-    // pulled high, causing the flash to brownout.
-    // See the ESP32 datasheet for more details.
-    warning = true;
-  }
-
-  if (gpio == 15) {
-    // If driven Low, silences boot messages printed by the ROM bootloader.
-    // Has an internal pull-up, so unconnected = High = normal output.
     warning = true;
   }
 
@@ -100,6 +80,32 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
   }
 
   return (input || output);
+}
+
+bool isBootStrapPin(int gpio)
+{
+  // GPIO 0 & 2 can't be used as an input. State during boot is dependent on boot mode.
+  if ((gpio == 0) || (gpio == 2)) {
+    return true;
+  }
+
+  if (gpio == 12) {
+    // If driven High, flash voltage (VDD_SDIO) is 1.8V not default 3.3V.
+    // Has internal pull-down, so unconnected = Low = 3.3V.
+    // May prevent flashing and/or booting if 3.3V flash is used and this pin is
+    // pulled high, causing the flash to brownout.
+    // See the ESP32 datasheet for more details.
+    return true;
+  }
+
+  if (gpio == 15) {
+    // If driven Low, silences boot messages printed by the ROM bootloader.
+    // Has an internal pull-up, so unconnected = High = normal output.
+    return true;
+  }
+
+
+  return false;
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

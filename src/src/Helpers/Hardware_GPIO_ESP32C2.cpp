@@ -14,20 +14,9 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
 
   input   = GPIO_IS_VALID_GPIO(gpio);
   output  = GPIO_IS_VALID_OUTPUT_GPIO(gpio);
-  warning = false;
+  warning = isBootStrapPin(gpio);
 
   if (!(GPIO_IS_VALID_GPIO(gpio))) { return false; }
-
-
-  if (gpio == 8) {
-    // Strapping pin which must be high during flashing
-    warning = true;
-  }
-
-  if (gpio == 9) {
-    // Strapping pin to force download mode (like GPIO-0 on ESP8266/ESP32-classic)
-    warning = true;
-  }
 
   if (gpio == 11) {
     // By default VDD_SPI is the power supply pin for embedded flash or external flash. It can only be used as GPIO11
@@ -45,6 +34,20 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
   }
 
   return (input || output);
+}
+
+bool isBootStrapPin(int gpio)
+{
+  if (gpio == 8) {
+    // Strapping pin which must be high during flashing
+    return true;
+  }
+
+  if (gpio == 9) {
+    // Strapping pin to force download mode (like GPIO-0 on ESP8266/ESP32-classic)
+    return true;
+  }
+  return false
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

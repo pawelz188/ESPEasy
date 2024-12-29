@@ -14,7 +14,7 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
 
   input   = GPIO_IS_VALID_GPIO(gpio);
   output  = GPIO_IS_VALID_OUTPUT_GPIO(gpio);
-  warning = false;
+  warning = isBootStrapPin(gpio);
 
   if (!(GPIO_IS_VALID_GPIO(gpio))) { return false; }
 
@@ -43,23 +43,28 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
     warning = true;
   }
 
+  return (input || output);
+}
+
+bool isBootStrapPin(int gpio)
+{
   if (gpio == 45) {
     // GPIO45 is used to select the VDD_SPI power supply voltage at reset:
     // • GPIO45 = 0, VDD_SPI pin is powered directly from VDD3P3_RTC via resistor RSP I . Typically this voltage is
     //   3.3 V. For more information, see Figure: ESP32-S3 Power Scheme in ESP32-S3 Datasheet.
     // • GPIO45 = 1, VDD_SPI pin is powered from internal 1.8 V LDO.
-    warning = true;
+    return true;
   }
 
   if (gpio == 46) {
     // Strapping pin which must be low during flashing
-    warning = true;
+    return true;
   }
 
   // GPIO 0  State during boot determines boot mode.
-  if (gpio == 0) { warning = true; }
+  if (gpio == 0) { return true; }
 
-  return (input || output);
+  return false;
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

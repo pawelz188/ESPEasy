@@ -14,7 +14,7 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
 
   input   = GPIO_IS_VALID_GPIO(gpio);
   output  = GPIO_IS_VALID_OUTPUT_GPIO(gpio);
-  warning = false;
+  warning = isBootStrapPin(gpio);
 
   if (!(GPIO_IS_VALID_GPIO(gpio))) { return false; }
 
@@ -24,21 +24,6 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
   // - https://docs.espressif.com/projects/esp-idf/en/v5.0/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html
   // - https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/peripherals/gpio.html
   // Datasheet: https://www.espressif.com/sites/default/files/documentation/esp32-c3_datasheet_en.pdf
-
-  if (gpio == 2) {
-    // Strapping pin which must be high during boot
-    warning = true;
-  }
-
-  if (gpio == 8) {
-    // Strapping pin which must be high during flashing
-    warning = true;
-  }
-
-  if (gpio == 9) {
-    // Strapping pin to force download mode (like GPIO-0 on ESP8266/ESP32-classic)
-    warning = true;
-  }
 
   if (gpio == 11) {
     if (getChipFeatures().embeddedFlash /* || !flashVddPinCanBeUsedAsGPIO() */) {
@@ -86,6 +71,25 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
   // GPIO 21: U0TXD
 
   return (input || output);
+}
+
+bool isBootStrapPin(int gpio)
+{
+  if (gpio == 2) {
+    // Strapping pin which must be high during boot
+    return true;
+  }
+
+  if (gpio == 8) {
+    // Strapping pin which must be high during flashing
+    return true;
+  }
+
+  if (gpio == 9) {
+    // Strapping pin to force download mode (like GPIO-0 on ESP8266/ESP32-classic)
+    return true;
+  }
+  return false;
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

@@ -30,7 +30,6 @@ int32_t getPartitionInfo(ESP8266_partition_type ptype, uint32_t& address, int32_
 // had to rename the function to isFlashInterfacePin_ESPEasy
 bool isFlashInterfacePin_ESPEasy(int gpio);
 
-
 uint32_t                   getFlashChipId();
 
 uint32_t                   getFlashRealSizeInBytes();

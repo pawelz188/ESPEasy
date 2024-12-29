@@ -14,7 +14,7 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
 
   input   = GPIO_IS_VALID_GPIO(gpio);
   output  = GPIO_IS_VALID_OUTPUT_GPIO(gpio);
-  warning = false;
+  warning = isBootStrapPin(gpio);
 
   if (!(GPIO_IS_VALID_GPIO(gpio))) { return false; }
 
@@ -42,22 +42,27 @@ bool getGpioInfo(int gpio, int& pinnr, bool& input, bool& output, bool& warning)
     warning = true;
   }
 
+  return (input || output);
+}
+
+bool isBootStrapPin(int gpio)
+{
   if (gpio == 45) {
     // VDD_SPI can work as the power supply for the external device at either
     // 1.8 V (when GPIO45 is 1 during boot), or
     // 3.3 V (when GPIO45 is 0 and at default state during boot).
-    warning = true;
+    return true;
   }
 
   // GPIO 0  State during boot determines boot mode.
-  if (gpio == 0) { warning = true; }
+  if (gpio == 0) { return true; }
 
   if (gpio == 46) {
     // Strapping pin which must be low during flashing
-    warning = true;
+    return true;
   }
 
-  return (input || output);
+  return false;
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

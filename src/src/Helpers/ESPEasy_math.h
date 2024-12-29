@@ -59,5 +59,11 @@ bool essentiallyZero(const double& a);
 #endif
 bool essentiallyZero(const float& a);
 
+ESPEASY_RULES_FLOAT_TYPE mapADCtoFloat(ESPEASY_RULES_FLOAT_TYPE float_value,
+                                       ESPEASY_RULES_FLOAT_TYPE adc1,
+                                       ESPEASY_RULES_FLOAT_TYPE adc2,
+                                       ESPEASY_RULES_FLOAT_TYPE out1,
+                                       ESPEASY_RULES_FLOAT_TYPE out2);
+
 
 #endif // HELPERS_ESPEASY_MATH_H

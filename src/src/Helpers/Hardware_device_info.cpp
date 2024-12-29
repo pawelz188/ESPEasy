@@ -36,22 +36,7 @@
   # endif // if ESP_IDF_VERSION_MAJOR == 4
 
 
-# if CONFIG_IDF_TARGET_ESP32S3   // ESP32-S3
-  #  define HAS_HALL_EFFECT_SENSOR  0
-  #  define HAS_TOUCH_GPIO 1
-# elif CONFIG_IDF_TARGET_ESP32S2 // ESP32-S2
-  #  define HAS_HALL_EFFECT_SENSOR  0
-  #  define HAS_TOUCH_GPIO 1
-# elif CONFIG_IDF_TARGET_ESP32C6 // ESP32-C6
-  #  define HAS_HALL_EFFECT_SENSOR  0
-  #  define HAS_TOUCH_GPIO  0
-# elif CONFIG_IDF_TARGET_ESP32C3 // ESP32-C3
-  #  define HAS_HALL_EFFECT_SENSOR  0
-  #  define HAS_TOUCH_GPIO  0
-# elif CONFIG_IDF_TARGET_ESP32C2 // ESP32-C2
-  #  define HAS_HALL_EFFECT_SENSOR  0
-  #  define HAS_TOUCH_GPIO  0
-# elif CONFIG_IDF_TARGET_ESP32   // ESP32/PICO-D4
+#if CONFIG_IDF_TARGET_ESP32   // ESP32/PICO-D4
   #  if ESP_IDF_VERSION_MAJOR < 5
   #   define HAS_HALL_EFFECT_SENSOR  1
   #  else // if ESP_IDF_VERSION_MAJOR < 5
@@ -59,10 +44,9 @@
 // Support for Hall Effect sensor was removed in ESP_IDF 5.x
   #   define HAS_HALL_EFFECT_SENSOR  0
   #  endif // if ESP_IDF_VERSION_MAJOR < 5
-  #  define HAS_TOUCH_GPIO 1
-# else // if CONFIG_IDF_TARGET_ESP32S3
-  #  error Target CONFIG_IDF_TARGET is not supported
-# endif // if CONFIG_IDF_TARGET_ESP32S3
+# else 
+  #  define HAS_HALL_EFFECT_SENSOR  0
+# endif
 
 # if ESP_IDF_VERSION_MAJOR >= 5
 

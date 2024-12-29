@@ -47,7 +47,7 @@ bool isBootStrapPin(int gpio)
     // Strapping pin to force download mode (like GPIO-0 on ESP8266/ESP32-classic)
     return true;
   }
-  return false
+  return false;
 }
 
 bool getGpioPullResistor(int gpio, bool& hasPullUp, bool& hasPullDown) {

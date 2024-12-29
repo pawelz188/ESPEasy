@@ -45,7 +45,7 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - 32-bit RISC-V single-core processor
       - 32-bit RISC-V single-core processor
       - 32-bit RISC-V single-core processor
-      - 32-bit RISC-V dual-core processor
+      - 32-bit RISC-V dual-core processor up to 400 MHz with AI instruction extension and FPU for the HP system
    *  - Core
       - 1
       - 2 (solo1:1)
@@ -80,7 +80,7 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - 3.0 ~ 3.6
       - 3.0 ~ 3.6
       - 3.0 ~ 3.6
-      - 3.3 ~ 3.6
+      - 3.0 ~ 3.6
       - 3.0 ~ 3.6
    *  - ESPEasy supported since
       - May-15
@@ -106,8 +106,8 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - 
       - 2021
       - 
-   *  - Status (2024/03)
-      - NRND
+   *  - Status (2024/12)
+      - End-Of-Life
       - Mass Production (solo1: NRND)
       - NRND
       - Mass Production
@@ -142,6 +142,18 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - IEEE 802.11 ax; 2.4 GHz; HT20; up to 150 Mbps
       - 
       - 
+   *  - 5 GHz Wi-Fi
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - Yes
+      - 
+      - 
+      - 
+      - 
    *  - Zigbee / Thread (802.15.4)
       - N/A
       - N/A
@@ -165,7 +177,7 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - Bluetooth LE v5.3
       - Bluetooth LE v5.0
       - Bluetooth LE v5.0
-      - 
+      - N/A
    *  - SRAM (KB)
       - 160
       - 520
@@ -297,7 +309,7 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - 2
       - 2
       - 2
-      - 6
+      - 5
    *  - SPI
       - 2
       - 4
@@ -346,6 +358,18 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - 1
       - 2
       - 3
+   *  - I3C
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 1
    *  - I2S
       - 1
       - 2
@@ -357,7 +381,7 @@ ESPEasy does support a number of variants of the processors manufactured by Espr
       - 1
       - 1
       - 1
-      - 4
+      - 3
    *  - RMT
       - 0
       - 1*8 channels

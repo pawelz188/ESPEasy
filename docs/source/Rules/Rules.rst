@@ -1746,6 +1746,11 @@ Added on 2020/08/12:
 * ``loopTimerSet``  To create a repeating timer with constant interval (seconds).
 * ``loopTimerSet_ms``  Same as ``loopTimerSet``, with msec interval.
 
+Added on 2024/12/23:
+
+* ``loopTimerSetAndRun``  Same as ``loopTimerSet``, and immediately starts the 1st iteration.
+* ``loopTimerSetAndRun_ms``  Same as ``loopTimerSetAndRun``, with msec interval.
+
 Here a small example to show how to start/stop and pause loop timers.
 This can be used to create quite complex timing schemas, especially when
 using multiple timers which are set to a relative prime interval.

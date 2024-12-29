@@ -20,39 +20,7 @@ bool isSerialConsolePin(int gpio) {
          #endif // if USES_ESPEASY_CONSOLE_FALLBACK_PORT
   ;
 #else
-#ifdef ESP32S2
-
-  return (gpio == 1 || gpio == 3)
-         #if USES_ESPEASY_CONSOLE_FALLBACK_PORT
-         && Settings.console_serial0_fallback
-         #endif // if USES_ESPEASY_CONSOLE_FALLBACK_PORT
-  ;
-
-#elif defined(ESP32S3)
-
-  return (gpio == 43 || gpio == 44)
-         #if USES_ESPEASY_CONSOLE_FALLBACK_PORT
-         && Settings.console_serial0_fallback
-         #endif // if USES_ESPEASY_CONSOLE_FALLBACK_PORT
-  ;
-
-#elif defined(ESP32C3)
-
-  return (gpio == 21 || gpio == 20) 
-         #if USES_ESPEASY_CONSOLE_FALLBACK_PORT
-         && Settings.console_serial0_fallback
-         #endif // if USES_ESPEASY_CONSOLE_FALLBACK_PORT
-  ;
-
-#elif defined(ESP32_CLASSIC)
-  return gpio == 1 || gpio == 3;
-
-#elif defined(ESP8266)
-  return gpio == 1 || gpio == 3;
-
-#else // ifdef ESP32S2
   static_assert(false, "Implement processor architecture");
   return false;
-#endif // ifdef ESP32S2
 #endif
 }

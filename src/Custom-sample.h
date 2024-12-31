@@ -5,7 +5,7 @@
     To modify the stock configuration without changing the EspEasy.ino file :
     1) rename this file to "Custom.h" (It is ignored by Git)
     2) define your own settings below
-    3) define USE_CUSTOM_H as a build flags. ie : export PLATFORMIO_BUILD_FLAGS="'-DUSE_CUSTOM_H'"
+    3) Build one of the environments with Custom in their name, they will automatically use this file if it exists
  */
 
 

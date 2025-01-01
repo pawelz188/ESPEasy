@@ -29,7 +29,7 @@ bool RulesCalculate_t::is_number(char oc, char c)
     (c == '.')   ||                                // A decimal point of a floating point number.
     ((oc == '0') && ((c == 'x') || (c == 'b'))) || // HEX (0x) or BIN (0b) prefixes.
     isxdigit(c)  ||                                // HEX digit also includes normal decimal numbers
-    (is_operator(oc) && (c == '-'))                // Beginning of a negative number after an operator.
+    ((is_operator(oc) || ('\0' == oc)) && (c == '-')) // Beginning of a negative number after an operator or 'separator'.
   ;
 }
 
@@ -399,7 +399,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
   checkRAM(F("Calculate"));
   #endif // ifndef BUILD_NO_RAM_TRACKER
   const char *strpos = input, *strend = input + strlen(input);
-  char token[TOKEN_LENGTH];
+  char token[TOKEN_LENGTH]{};
   char c, oc, *TokenPos = token;
   char stack[OPERATOR_STACK_SIZE]; // operator stack
   unsigned int sl = 0;             // stack length
@@ -433,6 +433,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
       {
         *TokenPos = c;
         ++TokenPos;
+        *(TokenPos) = 0; // Mark current end of token string
       }
 
       // If the token is an operator, op1, then:
@@ -486,6 +487,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
         *(TokenPos) = 0; // Mark end of token string
         error       = RPNCalculate(token);
         TokenPos    = token;
+        c           = 0; // reset
       }
 
       // If the token is a left parenthesis, then push it onto the stack.
@@ -494,6 +496,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
         if (sl >= OPERATOR_STACK_SIZE) { return CalculateReturnCode::ERROR_STACK_OVERFLOW; }
         stack[sl] = c;
         ++sl;
+        c = 0; // reset
       }
 
       // If the token is a right parenthesis:
@@ -540,6 +543,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
         if ((sl > 0) && (sl < OPERATOR_STACK_SIZE)) {
           sc = stack[sl - 1];
         }
+        c = 0; // reset
       }
       else {
         return CalculateReturnCode::ERROR_UNKNOWN_TOKEN;

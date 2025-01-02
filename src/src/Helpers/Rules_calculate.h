@@ -73,7 +73,10 @@ private:
   // @param oc  Previous character
   // @param c   Current character
   bool                is_number(char oc,
-                                char c);
+                                char c,
+                                char pc);
+
+  bool                is_any_operator(char c);
 
   bool                is_operator(char c);
 

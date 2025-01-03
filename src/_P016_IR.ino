@@ -206,13 +206,11 @@ boolean Plugin_016(uint8_t function, struct EventStruct *event, String& string)
       # else // if P016_SEND_IR_TO_CONTROLLER
       Device[deviceCount].VType = Sensor_VType::SENSOR_TYPE_ULONG;
       # endif // if P016_SEND_IR_TO_CONTROLLER
-      Device[deviceCount].Ports              = 0;
       Device[deviceCount].PullUpOption       = true;
       Device[deviceCount].InverseLogicOption = true;
-      Device[deviceCount].FormulaOption      = false;
       Device[deviceCount].ValueCount         = 1;
       Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = false;
+      Device[deviceCount].TimerOption        = true;
       Device[deviceCount].TimerOptional      = true;
       break;
     }
@@ -378,7 +376,7 @@ boolean Plugin_016(uint8_t function, struct EventStruct *event, String& string)
           int protocolCount = 0;
 
           for (int i = static_cast<int>(decode_type_t::UNKNOWN); i < size; i++) {
-              const String protocol = typeToString(static_cast<decode_type_t>(i), false);
+            const String protocol = typeToString(static_cast<decode_type_t>(i), false);
 
             if ((!bAcceptUnknownType) && (static_cast<decode_type_t>(i) == UNKNOWN)) {
               continue;

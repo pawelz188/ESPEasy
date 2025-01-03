@@ -37,15 +37,12 @@ boolean Plugin_001(uint8_t function, struct EventStruct *event, String& string)
       Device[++deviceCount].Number           = PLUGIN_ID_001;
       Device[deviceCount].Type               = DEVICE_TYPE_SINGLE;
       Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_SWITCH;
-      Device[deviceCount].Ports              = 0;
       Device[deviceCount].PullUpOption       = true;
       Device[deviceCount].InverseLogicOption = true;
-      Device[deviceCount].FormulaOption      = false;
       Device[deviceCount].ValueCount         = 1;
       Device[deviceCount].SendDataOption     = true;
       Device[deviceCount].TimerOption        = true;
       Device[deviceCount].TimerOptional      = true;
-      Device[deviceCount].GlobalSyncOption   = true;
       break;
     }
 
@@ -87,7 +84,8 @@ boolean Plugin_001(uint8_t function, struct EventStruct *event, String& string)
         const __FlashStringHelper *options[] = { F("Switch"), F("Dimmer") };
         const int optionValues[]             = { PLUGIN_001_TYPE_SWITCH, PLUGIN_001_TYPE_DIMMER };
         const uint8_t switchtype             = P001_data_struct::P001_getSwitchType(event);
-        addFormSelector(F("Switch Type"), F("type"), NR_ELEMENTS(optionValues), options, optionValues, switchtype);
+        constexpr size_t optionCount         = NR_ELEMENTS(optionValues);
+        addFormSelector(F("Switch Type"), F("type"), optionCount, options, optionValues, switchtype);
 
         if (switchtype == PLUGIN_001_TYPE_DIMMER)
         {

@@ -58,12 +58,7 @@ boolean Plugin_022(uint8_t function, struct EventStruct *event, String& string)
       Device[deviceCount].Type               = DEVICE_TYPE_I2C;
       Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_NONE;
       Device[deviceCount].Ports              = 1;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
-      Device[deviceCount].ValueCount         = 0;
       Device[deviceCount].Custom             = true;
-      Device[deviceCount].TimerOption        = false;
       Device[deviceCount].ExitTaskBeforeSave = false;
       break;
     }

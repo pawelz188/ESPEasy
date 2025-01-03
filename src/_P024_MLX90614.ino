@@ -29,17 +29,16 @@ boolean Plugin_024(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number         = PLUGIN_ID_024;
-      Device[deviceCount].Type             = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType            = Sensor_VType::SENSOR_TYPE_SINGLE;
-      Device[deviceCount].Ports            = 16;
-      Device[deviceCount].FormulaOption    = true;
-      Device[deviceCount].SendDataOption   = true;
-      Device[deviceCount].ValueCount       = 1;
-      Device[deviceCount].TimerOption      = true;
-      Device[deviceCount].GlobalSyncOption = true;
-      Device[deviceCount].PluginStats      = true;
-      Device[deviceCount].I2CMax100kHz     = true; // Max 100 kHz allowed/supported
+      Device[++deviceCount].Number       = PLUGIN_ID_024;
+      Device[deviceCount].Type           = DEVICE_TYPE_I2C;
+      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_SINGLE;
+      Device[deviceCount].Ports          = 16;
+      Device[deviceCount].FormulaOption  = true;
+      Device[deviceCount].SendDataOption = true;
+      Device[deviceCount].ValueCount     = 1;
+      Device[deviceCount].TimerOption    = true;
+      Device[deviceCount].PluginStats    = true;
+      Device[deviceCount].I2CMax100kHz   = true; // Max 100 kHz allowed/supported
       break;
     }
 
@@ -80,7 +79,8 @@ boolean Plugin_024(uint8_t function, struct EventStruct *event, String& string)
         (0x07),
         (0x06)
       };
-      addFormSelector(F("Option"), F("option"), NR_ELEMENTS(optionValues), options, optionValues, PCONFIG(0));
+      constexpr size_t optionCount = NR_ELEMENTS(optionValues);
+      addFormSelector(F("Option"), F("option"), optionCount, options, optionValues, PCONFIG(0));
 
       success = true;
       break;
@@ -110,7 +110,7 @@ boolean Plugin_024(uint8_t function, struct EventStruct *event, String& string)
         UserVar.setFloat(event->TaskIndex, 0, P024_data->readTemperature(PCONFIG(0)));
 
         if (loglevelActiveFor(LOG_LEVEL_INFO)) {
-          addLog(LOG_LEVEL_INFO, concat(F("MLX90614  : Temperature: "), formatUserVarNoCheck(event, 0)));
+          addLog(LOG_LEVEL_INFO, concat(F("MLX90614 : Temperature: "), formatUserVarNoCheck(event, 0)));
         }
 
         //        send(msgObjTemp024->set(UserVar[event->BaseVarIndex], 1)); // Mysensors

@@ -17,21 +17,16 @@ boolean Plugin_033(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number           = PLUGIN_ID_033;
-      Device[deviceCount].Type               = DEVICE_TYPE_DUMMY;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_SINGLE;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
-      Device[deviceCount].DecimalsOnly       = true;
-      Device[deviceCount].ValueCount         = 4;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].TimerOptional      = true;
-      Device[deviceCount].GlobalSyncOption   = true;
-      Device[deviceCount].OutputDataType     = Output_Data_type_t::All;
-      Device[deviceCount].PluginStats        = true;
+      Device[++deviceCount].Number       = PLUGIN_ID_033;
+      Device[deviceCount].Type           = DEVICE_TYPE_DUMMY;
+      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_SINGLE;
+      Device[deviceCount].DecimalsOnly   = true;
+      Device[deviceCount].ValueCount     = 4;
+      Device[deviceCount].SendDataOption = true;
+      Device[deviceCount].TimerOption    = true;
+      Device[deviceCount].TimerOptional  = true;
+      Device[deviceCount].OutputDataType = Output_Data_type_t::All;
+      Device[deviceCount].PluginStats    = true;
       break;
     }
 

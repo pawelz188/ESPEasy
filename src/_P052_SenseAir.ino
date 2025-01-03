@@ -7,6 +7,10 @@
 // ############################# Plugin 052: Senseair CO2 Sensors ########################################
 // #######################################################################################################
 
+/** Changelog:
+ * 25025-01-03 tonhuisman: Small code size reduction
+ */
+
 /*
    Plugin originally written by: Daniel Tedenljung
    info__AT__tedenljungconsulting.com
@@ -37,14 +41,10 @@ boolean Plugin_052(uint8_t function, struct EventStruct *event, String& string) 
       Device[++deviceCount].Number           = PLUGIN_ID_052;
       Device[deviceCount].Type               = DEVICE_TYPE_SERIAL;
       Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_SINGLE;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
       Device[deviceCount].FormulaOption      = true;
       Device[deviceCount].ValueCount         = 1;
       Device[deviceCount].SendDataOption     = true;
       Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].GlobalSyncOption   = true;
       Device[deviceCount].OutputDataType     = Output_Data_type_t::Simple;
       Device[deviceCount].ExitTaskBeforeSave = false;
       Device[deviceCount].PluginStats        = true;
@@ -151,13 +151,7 @@ boolean Plugin_052(uint8_t function, struct EventStruct *event, String& string) 
           {
             uint32_t reads_pass, reads_crc_failed, reads_nodata;
             P052_data->modbus.getStatistics(reads_pass, reads_crc_failed, reads_nodata);
-            String chksumStats;
-            chksumStats  = reads_pass;
-            chksumStats += '/';
-            chksumStats += reads_crc_failed;
-            chksumStats += '/';
-            chksumStats += reads_nodata;
-            addHtml(chksumStats);
+            addHtml(strformat(F("%d/%d/%d"), reads_pass, reads_crc_failed, reads_nodata));
           }
 
           bool hasFactorySettings = false;

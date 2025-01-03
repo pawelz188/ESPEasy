@@ -95,7 +95,6 @@ boolean Plugin_042(uint8_t function, struct EventStruct *event, String& string)
       Device[++deviceCount].Number       = PLUGIN_ID_042;
       Device[deviceCount].Type           = DEVICE_TYPE_SINGLE;
       Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_TRIPLE;
-      Device[deviceCount].Ports          = 0;
       Device[deviceCount].ValueCount     = 3;
       Device[deviceCount].SendDataOption = true;
       Device[deviceCount].TimerOption    = true;
@@ -164,18 +163,16 @@ boolean Plugin_042(uint8_t function, struct EventStruct *event, String& string)
       addHtml(F("<input type='radio' id='clrDef' name='" P042_WEBVAR_COLORTYPE_S "' value='0'"));
 
       if (Candle_color == P042_ColorType::ColorDefault) {
-        addHtml(F(" checked>"));
-      } else {
-        addHtml('>');
+        addHtml(F(" checked"));
       }
+      addHtml('>');
       addHtml(F("<label for='clrDef'> Use default color</label><br>"));
       addHtml(F("<input type='radio' id='clrSel' name='" P042_WEBVAR_COLORTYPE_S "' value='1'"));
 
       if (Candle_color == P042_ColorType::ColorSelected) {
-        addHtml(F(" checked>"));
-      } else {
-        addHtml('>');
+        addHtml(F(" checked"));
       }
+      addHtml('>');
       addHtml(F("<label for='clrSel'> Use selected color</label><br>"));
 
       // http://jscolor.com/examples/

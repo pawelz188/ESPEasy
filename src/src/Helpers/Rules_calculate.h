@@ -76,8 +76,6 @@ private:
                                 char c,
                                 char pc);
 
-  bool                is_any_operator(char c);
-
   bool                is_operator(char c);
 
   bool                is_unary_operator(char c);
@@ -108,14 +106,15 @@ private:
 
   // operators
   // precedence   operators         associativity
-  // 3            !                 right to left
+  // 4            !                 right to left
+  // 3            ^                 left to right
   // 2            * / %             left to right
-  // 1            + - ^             left to right
+  // 1            + -               left to right
   int          op_preced(const char c);
 
   bool         op_left_assoc(const char c);
 
-  unsigned int op_arg_count(const char c);
+  // unused: unsigned int op_arg_count(const char c);
 
 public:
 

@@ -34,11 +34,6 @@ bool RulesCalculate_t::is_number(char oc, char c, char pc)
   ;
 }
 
-bool RulesCalculate_t::is_any_operator(char c)
-{
-  return (is_operator(c) || is_unary_operator(c) || is_quinary_operator(c));
-}
-
 bool RulesCalculate_t::is_operator(char c)
 {
   return c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '%';
@@ -395,6 +390,7 @@ bool RulesCalculate_t::op_left_assoc(const char c)
   return false;
 }
 
+/* unused:
 unsigned int RulesCalculate_t::op_arg_count(const char c)
 {
   if (is_unary_operator(c)) { return 1; }
@@ -404,6 +400,7 @@ unsigned int RulesCalculate_t::op_arg_count(const char c)
   if (is_quinary_operator(c)) { return 5; }
   return 0;
 }
+*/
 
 CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RULES_FLOAT_TYPE *result)
 {
@@ -462,7 +459,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
       }
 
       // If the token is any operator, op1, then:
-      else if (is_any_operator(c))
+      else if (is_operator(c) || is_unary_operator(c) || is_quinary_operator(c))
       {
         *(TokenPos) = 0; // Mark end of token string
         error       = RPNCalculate(token);
@@ -533,7 +530,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
 
         // Until the token at the top of the stack is a left parenthesis,
         // pop operators off the stack onto the token queue
-        while ((sl >= 0) && (sl < OPERATOR_STACK_SIZE))
+        while (sl < OPERATOR_STACK_SIZE)
         {
           *(TokenPos) = 0; // Mark end of token string
           // addLog(LOG_LEVEL_INFO, strformat(F("doCalculate popping stack sl: %u token: %s sc: %d"), sl, token, sc));
@@ -552,7 +549,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
 
           if (isError(error)) { return error; }
 
-          if (sl > OPERATOR_STACK_SIZE) { return CalculateReturnCode::ERROR_STACK_OVERFLOW; }
+          // we're not growing the stack: if (sl > OPERATOR_STACK_SIZE) { return CalculateReturnCode::ERROR_STACK_OVERFLOW; }
           if (sl > 0) {
             sc = stack[sl - 1];
           }
@@ -565,7 +562,7 @@ CalculateReturnCode RulesCalculate_t::doCalculate(const char *input, ESPEASY_RUL
             pe = true;
             if (sl > 1) {
               sc = stack[sl - 2];
-              if (!is_any_operator(sc)) {
+              if (!(is_operator(sc) || is_unary_operator(sc) || is_quinary_operator(sc))) {
                 sc = '(';
               }
             }

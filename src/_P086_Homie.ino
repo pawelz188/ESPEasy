@@ -45,7 +45,6 @@ boolean Plugin_086(uint8_t function, struct EventStruct *event, String& string)
       Device[++deviceCount].Number     = PLUGIN_ID_086;
       Device[deviceCount].Type         = DEVICE_TYPE_DUMMY;
       Device[deviceCount].VType        = Sensor_VType::SENSOR_TYPE_NONE;
-      Device[deviceCount].Ports        = 0;
       Device[deviceCount].DecimalsOnly = true;
       Device[deviceCount].ValueCount   = PLUGIN_086_VALUE_MAX;
       Device[deviceCount].Custom       = true;

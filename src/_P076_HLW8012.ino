@@ -30,9 +30,9 @@
 HLW8012 *Plugin_076_hlw = nullptr;
 
 # define PLUGIN_076
-# define PLUGIN_ID_076 76
-# define PLUGIN_076_DEBUG false // activate extra log info in the debug
-# define PLUGIN_NAME_076 "Energy (AC) - HLW8012/BL0937"
+# define PLUGIN_ID_076         76
+# define PLUGIN_076_DEBUG      false // activate extra log info in the debug
+# define PLUGIN_NAME_076       "Energy (AC) - HLW8012/BL0937"
 # define PLUGIN_VALUENAME1_076 "Voltage"
 # define PLUGIN_VALUENAME2_076 "Current"
 # define PLUGIN_VALUENAME3_076 "Power"
@@ -119,7 +119,6 @@ boolean Plugin_076(uint8_t function, struct EventStruct *event, String& string) 
       Device[++deviceCount].Number       = PLUGIN_ID_076;
       Device[deviceCount].Type           = DEVICE_TYPE_TRIPLE;
       Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_QUAD;
-      Device[deviceCount].Ports          = 0;
       Device[deviceCount].FormulaOption  = true;
       Device[deviceCount].ValueCount     = 4;
       Device[deviceCount].SendDataOption = true;

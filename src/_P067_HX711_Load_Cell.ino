@@ -44,7 +44,6 @@ boolean Plugin_067(uint8_t function, struct EventStruct *event, String& string)
     {
       Device[++deviceCount].Number       = PLUGIN_ID_067;
       Device[deviceCount].Type           = DEVICE_TYPE_DUAL;
-      Device[deviceCount].Ports          = 0;
       Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_DUAL;
       Device[deviceCount].FormulaOption  = true;
       Device[deviceCount].ValueCount     = 2;

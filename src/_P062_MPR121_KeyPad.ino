@@ -46,16 +46,11 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
     {
       Device[++deviceCount].Number           = PLUGIN_ID_062;
       Device[deviceCount].Type               = DEVICE_TYPE_I2C;
-      Device[deviceCount].Ports              = 0;
       Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_SWITCH;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
       Device[deviceCount].ValueCount         = 1;
       Device[deviceCount].SendDataOption     = true;
       Device[deviceCount].TimerOption        = true;
       Device[deviceCount].TimerOptional      = true;
-      Device[deviceCount].GlobalSyncOption   = true;
       Device[deviceCount].ExitTaskBeforeSave = false;
       break;
     }
@@ -105,7 +100,7 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
         if (touch_treshold == 0) {
           touch_treshold = P062_DEFAULT_TOUCH_TRESHOLD; // default value
         }
-        addFormNumericBox(F("Touch treshold (1..255)"), F("touch_treshold"), touch_treshold, 0, 255);
+        addFormNumericBox(F("Touch treshold (1..255)"), F("ttreshold"), touch_treshold, 0, 255);
         addUnit(concat(F("Default: "), P062_DEFAULT_TOUCH_TRESHOLD));
       }
 
@@ -115,7 +110,7 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
         if (release_treshold == 0) {
           release_treshold = P062_DEFAULT_RELEASE_TRESHOLD; // default value
         }
-        addFormNumericBox(F("Release treshold (1..255)"), F("release_treshold"), release_treshold, 0, 255);
+        addFormNumericBox(F("Release treshold (1..255)"), F("rtreshold"), release_treshold, 0, 255);
         addUnit(concat(F("Default: "), P062_DEFAULT_RELEASE_TRESHOLD));
       }
       {
@@ -127,7 +122,8 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
           MPR212_NORMAL_SENSITIVITY,
           MPR212_EXTRA_SENSITIVITY
         };
-        addFormSelector(F("Panel sensitivity"), F("panel_sensitivity"), 2, sensitivityOptions, sensitivityValues, PCONFIG(4));
+        constexpr size_t optionCount = NR_ELEMENTS(sensitivityValues);
+        addFormSelector(F("Panel sensitivity"), F("psens"), optionCount, sensitivityOptions, sensitivityValues, PCONFIG(4));
       }
       {
         bool canCalibrate     = true;
@@ -183,10 +179,10 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
 
         if (canCalibrate) {
           const int choice1 = tbUseCalibration ? 1 : 0;
-          addFormSelector_YesNo(F("Enable Calibration"), F("use_calibration"), choice1, true);
+          addFormSelector_YesNo(F("Enable Calibration"), F("ucal"), choice1, true);
 
           if (tbUseCalibration) {
-            addFormCheckBox(F("Clear calibrationdata"), F("clear_calibrate"), false);
+            addFormCheckBox(F("Clear calibrationdata"), F("clr_cal"), false);
           }
         }
         delete P062_data;
@@ -201,13 +197,12 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
 
       PCONFIG(1) = isFormItemChecked(F("scancode"));
 
-      PCONFIG(2) = getFormItemInt(F("touch_treshold"));
-      PCONFIG(3) = getFormItemInt(F("release_treshold"));
-      PCONFIG(4) = getFormItemInt(F("panel_sensitivity"));
+      PCONFIG(2) = getFormItemInt(F("ttreshold"));
+      PCONFIG(3) = getFormItemInt(F("rtreshold"));
+      PCONFIG(4) = getFormItemInt(F("psens"));
 
-      uint32_t lSettings        = 0;
-      bool     tbUseCalibration = getFormItemInt(F("use_calibration")) == 1;
-      bitWrite(lSettings, P062_FLAGS_USE_CALIBRATION, tbUseCalibration);
+      uint32_t lSettings = 0;
+      bitWrite(lSettings, P062_FLAGS_USE_CALIBRATION, getFormItemInt(F("ucal")) == 1);
       P062_CONFIG_FLAGS = lSettings;
 
       {
@@ -231,9 +226,7 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
         # ifdef PLUGIN_062_DEBUG
 
         if (loglevelActiveFor(LOG_LEVEL_INFO)) {
-          String log = F("P062_data save size: ");
-          log += sizeof(P062_data->StoredSettings);
-          addLogMove(LOG_LEVEL_INFO, log);
+          addLogMove(LOG_LEVEL_INFO, strformat(F("P062_data save size: %u"), sizeof(P062_data->StoredSettings)));
         }
         # endif // PLUGIN_062_DEBUG
         SaveCustomTaskSettings(event->TaskIndex, reinterpret_cast<const uint8_t *>(&(P062_data->StoredSettings)),
@@ -243,7 +236,7 @@ boolean Plugin_062(uint8_t function, struct EventStruct *event, String& string)
           delete P062_data;
           P062_data = nullptr;
         } else {
-          bool clearCalibration = isFormItemChecked(F("clear_calibrate"));
+          const bool clearCalibration = isFormItemChecked(F("clr_cal"));
 
           if (clearCalibration) {
             P062_data->clearCalibrationData();

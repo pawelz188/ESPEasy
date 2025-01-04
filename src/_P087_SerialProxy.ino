@@ -73,17 +73,12 @@ boolean Plugin_087(uint8_t function, struct EventStruct *event, String& string) 
 
   switch (function) {
     case PLUGIN_DEVICE_ADD: {
-      Device[++deviceCount].Number           = PLUGIN_ID_087;
-      Device[deviceCount].Type               = DEVICE_TYPE_SERIAL;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_STRING;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
-      Device[deviceCount].ValueCount         = 1;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].GlobalSyncOption   = false;
+      Device[++deviceCount].Number       = PLUGIN_ID_087;
+      Device[deviceCount].Type           = DEVICE_TYPE_SERIAL;
+      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_STRING;
+      Device[deviceCount].ValueCount     = 1;
+      Device[deviceCount].SendDataOption = true;
+      Device[deviceCount].TimerOption    = true;
 
       // FIXME TD-er: Not sure if access to any existing task data is needed when saving
       Device[deviceCount].ExitTaskBeforeSave = false;
@@ -389,7 +384,7 @@ void P087_html_show_matchForms(struct EventStruct *event) {
           const __FlashStringHelper *options[2];
           options[P087_Filter_Comp::Equal]    = F("==");
           options[P087_Filter_Comp::NotEqual] = F("!=");
-          const int optionValues[2] = { P087_Filter_Comp::Equal, P087_Filter_Comp::NotEqual };
+          const int optionValues[] = { P087_Filter_Comp::Equal, P087_Filter_Comp::NotEqual };
           addSelector(id, 2, options, optionValues, nullptr, static_cast<int>(comparator), false, true, F(""));
           break;
         }

@@ -608,7 +608,7 @@ boolean Plugin_037(uint8_t function, struct EventStruct *event, String& string)
 
                 if (loglevelActiveFor(LOG_LEVEL_INFO)) {
                   addLog(LOG_LEVEL_INFO, strformat(F("IMPT : [%s#%s] : %.3f"),
-                                                   getTaskDeviceName(event->TaskIndex),
+                                                   getTaskDeviceName(event->TaskIndex).c_str(),
                                                    checkJson ? key.c_str() : getTaskValueName(event->TaskIndex, x).c_str(),
                                                    doublePayload));
                 }

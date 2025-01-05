@@ -51,14 +51,14 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
 {
   boolean success = false;
 
-  AtlasEZO_Sensors_e board_type    = AtlasEZO_Sensors_e::UNKNOWN;
-  const uint8_t i2cAddressValues[] = { 0x63, 0x62, 0x64, 0x61, 0x6F
-                                       # if P103_USE_RTD
-                                       ,     0x66
-                                       # endif // if P103_USE_RTD
-                                       # if P103_USE_FLOW
-                                       ,     0x68
-                                       # endif // if P103_USE_FLOW
+  AtlasEZO_Sensors_e board_type         = AtlasEZO_Sensors_e::UNKNOWN;
+  constexpr uint8_t  i2cAddressValues[] = { 0x63, 0x62, 0x64, 0x61, 0x6F,
+                                            # if P103_USE_RTD
+                                            0x66,
+                                            # endif // if P103_USE_RTD
+                                            # if P103_USE_FLOW
+                                            0x68,
+                                            # endif // if P103_USE_FLOW
   };
   constexpr int i2c_nr_elements = NR_ELEMENTS(i2cAddressValues);
 
@@ -75,7 +75,6 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
       Device[++deviceCount].Number       = PLUGIN_ID_103;
       Device[deviceCount].Type           = DEVICE_TYPE_I2C;
       Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_DUAL;
-      Device[deviceCount].Ports          = 0;
       Device[deviceCount].FormulaOption  = true;
       Device[deviceCount].ValueCount     = 2;
       Device[deviceCount].SendDataOption = true;
@@ -503,8 +502,8 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
       if ((AtlasEZO_Sensors_e::PH == board_type) ||
           (AtlasEZO_Sensors_e::EC == board_type) ||
           (AtlasEZO_Sensors_e::DO == board_type)) {
-        char   deviceTemperatureTemplate[40]{};
-        String tmpString = webArg(F("_template"));
+        char deviceTemperatureTemplate[40]{};
+        const String tmpString = webArg(F("_template"));
         safe_strncpy(deviceTemperatureTemplate, tmpString.c_str(), sizeof(deviceTemperatureTemplate) - 1);
         ZERO_TERMINATE(deviceTemperatureTemplate); // be sure that our string ends with a \0
 
@@ -585,7 +584,7 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
       UserVar.setFloat(event->TaskIndex, 0, -1);
 
       if (P103_send_I2C_command(P103_I2C_ADDRESS, readCommand, boarddata)) {
-        String sensorString(boarddata);
+        const String sensorString(boarddata);
         addLog(LOG_LEVEL_INFO, concat(F("P103: READ result: "), sensorString));
 
         float sensor_f{};
@@ -625,8 +624,8 @@ boolean Plugin_103(uint8_t function, struct EventStruct *event, String& string)
       UserVar.setFloat(event->TaskIndex, 1, -1);
 
       if (P103_send_I2C_command(P103_I2C_ADDRESS, F("Status"), boarddata)) {
-        String voltage(boarddata);
-        float  volt_f{};
+        const String voltage(boarddata);
+        float volt_f{};
         string2float(voltage.substring(voltage.lastIndexOf(',') + 1), volt_f);
         UserVar.setFloat(event->TaskIndex, 1, volt_f);
       }

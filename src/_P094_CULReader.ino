@@ -57,14 +57,9 @@ boolean Plugin_094(uint8_t function, struct EventStruct *event, String& string) 
       Device[deviceCount].Type               = DEVICE_TYPE_SERIAL;
       Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_STRING;
       Device[deviceCount].OutputDataType     = Output_Data_type_t::Default;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
       Device[deviceCount].ValueCount         = 1;
       Device[deviceCount].SendDataOption     = true;
       Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].GlobalSyncOption   = false;
       Device[deviceCount].DuplicateDetection = true;
 
       // FIXME TD-er: Not sure if access to any existing task data is needed when saving
@@ -318,10 +313,8 @@ boolean Plugin_094(uint8_t function, struct EventStruct *event, String& string) 
           # endif // if P094_DEBUG_OPTIONS
 
           if (loglevelActiveFor(LOG_LEVEL_INFO)) {
-            String log = F("CUL Reader: Sending: ");
-            log += event->String2.substring(0, 20);
-            log += F("...");
-            addLogMove(LOG_LEVEL_INFO, log);
+            addLogMove(LOG_LEVEL_INFO, strformat(F("CUL Reader: Sending: %s..."),
+                                                 event->String2.substring(0, 20).c_str()));
           }
 
           //          sendData_checkDuplicates(event, event->String2.substring(0, 22));
@@ -447,7 +440,7 @@ boolean Plugin_094(uint8_t function, struct EventStruct *event, String& string) 
 
       break;
     }
-#ifdef USES_ESPEASY_NOW
+# ifdef USES_ESPEASY_NOW
     case PLUGIN_FILTEROUT_CONTROLLER_DATA:
     {
       // event->String1 => topic;
@@ -463,7 +456,7 @@ boolean Plugin_094(uint8_t function, struct EventStruct *event, String& string) 
 
       break;
     }
-#endif
+# endif // ifdef USES_ESPEASY_NOW
   }
   return success;
 }

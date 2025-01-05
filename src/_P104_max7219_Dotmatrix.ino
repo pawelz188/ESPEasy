@@ -140,15 +140,6 @@ boolean Plugin_104(uint8_t function, struct EventStruct *event, String& string) 
       Device[++deviceCount].Number           = PLUGIN_ID_104;
       Device[deviceCount].Type               = DEVICE_TYPE_SPI;
       Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_NONE;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
-      Device[deviceCount].ValueCount         = 0;
-      Device[deviceCount].SendDataOption     = false;
-      Device[deviceCount].TimerOption        = false;
-      Device[deviceCount].TimerOptional      = false;
-      Device[deviceCount].GlobalSyncOption   = true;
       Device[deviceCount].ExitTaskBeforeSave = false;
       break;
     }

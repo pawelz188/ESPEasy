@@ -59,7 +59,6 @@ boolean Plugin_105(uint8_t function, struct EventStruct *event, String& string)
       Device[++deviceCount].Number       = PLUGIN_ID_105;
       Device[deviceCount].Type           = DEVICE_TYPE_I2C;
       Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_TEMP_HUM;
-      Device[deviceCount].Ports          = 0;
       Device[deviceCount].FormulaOption  = true;
       Device[deviceCount].ValueCount     = 2;
       Device[deviceCount].SendDataOption = true;
@@ -84,7 +83,7 @@ boolean Plugin_105(uint8_t function, struct EventStruct *event, String& string)
     case PLUGIN_I2C_HAS_ADDRESS:
     case PLUGIN_WEBFORM_SHOW_I2C_PARAMS:
     {
-      const uint8_t i2cAddressValues[2] = { 0x38, 0x39 };
+      const uint8_t i2cAddressValues[] = { 0x38, 0x39 };
 
       if (function == PLUGIN_WEBFORM_SHOW_I2C_PARAMS) {
         addFormSelectorI2C(F("i2c_addr"), 2, i2cAddressValues, PCONFIG(0));
@@ -129,6 +128,7 @@ boolean Plugin_105(uint8_t function, struct EventStruct *event, String& string)
                   )
               ) {
             hasOtherI2CDevices = true;
+            break;
           }
         }
 
@@ -143,7 +143,8 @@ boolean Plugin_105(uint8_t function, struct EventStruct *event, String& string)
         const int indices[]                  = { static_cast<int>(AHTx_device_type::AHT10_DEVICE),
                                                  static_cast<int>(AHTx_device_type::AHT20_DEVICE),
                                                  static_cast<int>(AHTx_device_type::AHT21_DEVICE) };
-        addFormSelector(F("Sensor model"), F("ahttype"), 3, options, indices, PCONFIG(1), true);
+        constexpr size_t optionCount = NR_ELEMENTS(indices);
+        addFormSelector(F("Sensor model"), F("ahttype"), optionCount, options, indices, PCONFIG(1), true);
         addFormNote(F("Changing Sensor model will reload the page."));
 
         if (static_cast<int>(AHTx_device_type::AHT10_DEVICE) == PCONFIG(1)) {

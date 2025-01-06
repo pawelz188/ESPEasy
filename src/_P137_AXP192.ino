@@ -81,17 +81,18 @@ boolean Plugin_137(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number       = PLUGIN_ID_137;
-      Device[deviceCount].Type           = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_QUAD;
-      Device[deviceCount].OutputDataType = Output_Data_type_t::Simple;
-      Device[deviceCount].PowerManager   = true; // So it can be started before SPI is initialized
-      Device[deviceCount].FormulaOption  = true;
-      Device[deviceCount].ValueCount     = 4;
-      Device[deviceCount].SendDataOption = true;
-      Device[deviceCount].TimerOption    = true;
-      Device[deviceCount].TimerOptional  = true;
-      Device[deviceCount].PluginStats    = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_137;
+      dev.Type           = DEVICE_TYPE_I2C;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_QUAD;
+      dev.OutputDataType = Output_Data_type_t::Simple;
+      dev.PowerManager   = true; // So it can be started before SPI is initialized
+      dev.FormulaOption  = true;
+      dev.ValueCount     = 4;
+      dev.SendDataOption = true;
+      dev.TimerOption    = true;
+      dev.TimerOptional  = true;
+      dev.PluginStats    = true;
       break;
     }
 

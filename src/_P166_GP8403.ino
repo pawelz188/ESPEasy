@@ -53,19 +53,16 @@ boolean Plugin_166(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number           = PLUGIN_ID_166;
-      Device[deviceCount].Type               = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_DUAL;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = true;
-      Device[deviceCount].ValueCount         = 2;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].TimerOptional      = true;
-      Device[deviceCount].GlobalSyncOption   = true;
-      Device[deviceCount].PluginStats        = true; // FIXME: Is this useful?
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_166;
+      dev.Type           = DEVICE_TYPE_I2C;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_DUAL;
+      dev.FormulaOption  = true;
+      dev.ValueCount     = 2;
+      dev.SendDataOption = true;
+      dev.TimerOption    = true;
+      dev.TimerOptional  = true;
+      dev.PluginStats    = true; // FIXME: Is this useful?
 
       break;
     }

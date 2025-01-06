@@ -86,15 +86,17 @@ boolean Plugin_020(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
+      auto& dev = Device[++deviceCount];
+
       if (P020_Emulate_P044) {
-        Device[++deviceCount].Number       = PLUGIN_ID_020_044;
-        Device[deviceCount].SendDataOption = false;
+        dev.Number         = PLUGIN_ID_020_044;
+        dev.SendDataOption = false;
       } else {
-        Device[++deviceCount].Number       = PLUGIN_ID_020;
-        Device[deviceCount].SendDataOption = true;
+        dev.Number         = PLUGIN_ID_020;
+        dev.SendDataOption = true;
       }
-      Device[deviceCount].Type  = DEVICE_TYPE_SERIAL;
-      Device[deviceCount].VType = Sensor_VType::SENSOR_TYPE_STRING;
+      dev.Type  = DEVICE_TYPE_SERIAL;
+      dev.VType = Sensor_VType::SENSOR_TYPE_STRING;
       break;
     }
     case PLUGIN_GET_DEVICENAME:

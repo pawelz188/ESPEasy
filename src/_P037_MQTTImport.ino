@@ -113,11 +113,12 @@ boolean Plugin_037(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number     = PLUGIN_ID_037;
-      Device[deviceCount].Type         = DEVICE_TYPE_DUMMY;
-      Device[deviceCount].VType        = Sensor_VType::SENSOR_TYPE_SINGLE; // This means it has a single pin
-      Device[deviceCount].DecimalsOnly = true;                             // We only want to have the decimals option
-      Device[deviceCount].ValueCount   = VARS_PER_TASK;
+      auto& dev = Device[++deviceCount];
+      dev.Number       = PLUGIN_ID_037;
+      dev.Type         = DEVICE_TYPE_DUMMY;
+      dev.VType        = Sensor_VType::SENSOR_TYPE_SINGLE; // This means it has a single pin
+      dev.DecimalsOnly = true;                             // We only want to have the decimals option
+      dev.ValueCount   = VARS_PER_TASK;
       break;
     }
 

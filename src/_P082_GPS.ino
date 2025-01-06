@@ -35,15 +35,16 @@ boolean Plugin_082(uint8_t function, struct EventStruct *event, String& string) 
 
   switch (function) {
     case PLUGIN_DEVICE_ADD: {
-      Device[++deviceCount].Number       = PLUGIN_ID_082;
-      Device[deviceCount].Type           = DEVICE_TYPE_SERIAL_PLUS1;
-      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_QUAD;
-      Device[deviceCount].FormulaOption  = true;
-      Device[deviceCount].ValueCount     = 4;
-      Device[deviceCount].OutputDataType = Output_Data_type_t::Simple;
-      Device[deviceCount].SendDataOption = true;
-      Device[deviceCount].TimerOption    = true;
-      Device[deviceCount].PluginStats    = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_082;
+      dev.Type           = DEVICE_TYPE_SERIAL_PLUS1;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_QUAD;
+      dev.FormulaOption  = true;
+      dev.ValueCount     = 4;
+      dev.OutputDataType = Output_Data_type_t::Simple;
+      dev.SendDataOption = true;
+      dev.TimerOption    = true;
+      dev.PluginStats    = true;
       break;
     }
 

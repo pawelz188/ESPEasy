@@ -32,20 +32,16 @@ boolean Plugin_112(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number           = PLUGIN_ID_112;
-      Device[deviceCount].Type               = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_TRIPLE;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].ValueCount         = 3;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
-      Device[deviceCount].DecimalsOnly       = true;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].GlobalSyncOption   = true;
-      Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].OutputDataType     = Output_Data_type_t::All;
-      Device[deviceCount].PluginStats        = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_112;
+      dev.Type           = DEVICE_TYPE_I2C;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_TRIPLE;
+      dev.ValueCount     = 3;
+      dev.DecimalsOnly   = true;
+      dev.SendDataOption = true;
+      dev.TimerOption    = true;
+      dev.OutputDataType = Output_Data_type_t::All;
+      dev.PluginStats    = true;
       break;
     }
 

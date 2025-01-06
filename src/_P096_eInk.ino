@@ -175,16 +175,15 @@ boolean Plugin_096(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number = PLUGIN_ID_096;
-      Device[deviceCount].Type     = DEVICE_TYPE_SPI3;
-      Device[deviceCount].VType    = Sensor_VType::SENSOR_TYPE_NONE;
+      auto& dev = Device[++deviceCount];
+      dev.Number = PLUGIN_ID_096;
+      dev.Type   = DEVICE_TYPE_SPI3;
+      dev.VType  = Sensor_VType::SENSOR_TYPE_NONE;
       # if P096_USE_EXTENDED_SETTINGS
-      Device[deviceCount].ValueCount    = 2;
-      Device[deviceCount].TimerOption   = true;
-      Device[deviceCount].TimerOptional = true;
+      dev.ValueCount    = 2;
+      dev.TimerOption   = true;
+      dev.TimerOptional = true;
       # endif // if P096_USE_EXTENDED_SETTINGS
-
-      success = true;
       break;
     }
 

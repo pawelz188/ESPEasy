@@ -146,13 +146,13 @@ boolean Plugin_095(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number      = PLUGIN_ID_095;
-      Device[deviceCount].Type          = DEVICE_TYPE_SPI3;
-      Device[deviceCount].VType         = Sensor_VType::SENSOR_TYPE_NONE;
-      Device[deviceCount].ValueCount    = 2;
-      Device[deviceCount].TimerOption   = true;
-      Device[deviceCount].TimerOptional = true;
-      success                           = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number        = PLUGIN_ID_095;
+      dev.Type          = DEVICE_TYPE_SPI3;
+      dev.VType         = Sensor_VType::SENSOR_TYPE_NONE;
+      dev.ValueCount    = 2;
+      dev.TimerOption   = true;
+      dev.TimerOptional = true;
       break;
     }
 

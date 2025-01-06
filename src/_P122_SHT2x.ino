@@ -51,21 +51,19 @@ boolean Plugin_122(uint8_t function, struct EventStruct *event, String& string)
     case PLUGIN_DEVICE_ADD:
     {
       // This case defines the device characteristics
-      Device[++deviceCount].Number           = PLUGIN_ID_122;
-      Device[deviceCount].Type               = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_TEMP_HUM;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = true;
-      Device[deviceCount].ValueCount         = 2;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].I2CNoDeviceCheck   = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number           = PLUGIN_ID_122;
+      dev.Type             = DEVICE_TYPE_I2C;
+      dev.VType            = Sensor_VType::SENSOR_TYPE_TEMP_HUM;
+      dev.FormulaOption    = true;
+      dev.ValueCount       = 2;
+      dev.SendDataOption   = true;
+      dev.TimerOption      = true;
+      dev.I2CNoDeviceCheck = true;
 
-      // Device[deviceCount].GlobalSyncOption   = true;
-      Device[deviceCount].PluginStats    = true;
-      Device[deviceCount].OutputDataType = Output_Data_type_t::Default;
+      // dev.GlobalSyncOption   = true;
+      dev.PluginStats    = true;
+      dev.OutputDataType = Output_Data_type_t::Default;
       break;
     }
 
@@ -251,4 +249,4 @@ boolean Plugin_122(uint8_t function, struct EventStruct *event, String& string)
   return success;
 }   // function
 
-#endif  //USES_P122
+#endif  // USES_P122

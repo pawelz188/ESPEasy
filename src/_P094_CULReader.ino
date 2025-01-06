@@ -53,17 +53,18 @@ boolean Plugin_094(uint8_t function, struct EventStruct *event, String& string) 
 
   switch (function) {
     case PLUGIN_DEVICE_ADD: {
-      Device[++deviceCount].Number           = PLUGIN_ID_094;
-      Device[deviceCount].Type               = DEVICE_TYPE_SERIAL;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_STRING;
-      Device[deviceCount].OutputDataType     = Output_Data_type_t::Default;
-      Device[deviceCount].ValueCount         = 1;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = true;
-      Device[deviceCount].DuplicateDetection = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number             = PLUGIN_ID_094;
+      dev.Type               = DEVICE_TYPE_SERIAL;
+      dev.VType              = Sensor_VType::SENSOR_TYPE_STRING;
+      dev.OutputDataType     = Output_Data_type_t::Default;
+      dev.ValueCount         = 1;
+      dev.SendDataOption     = true;
+      dev.TimerOption        = true;
+      dev.DuplicateDetection = true;
 
       // FIXME TD-er: Not sure if access to any existing task data is needed when saving
-      Device[deviceCount].ExitTaskBeforeSave = true;
+      dev.ExitTaskBeforeSave = true;
       break;
     }
 

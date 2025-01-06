@@ -137,10 +137,11 @@ boolean Plugin_104(uint8_t function, struct EventStruct *event, String& string) 
 
   switch (function) {
     case PLUGIN_DEVICE_ADD: {
-      Device[++deviceCount].Number           = PLUGIN_ID_104;
-      Device[deviceCount].Type               = DEVICE_TYPE_SPI;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_NONE;
-      Device[deviceCount].ExitTaskBeforeSave = false;
+      auto& dev = Device[++deviceCount];
+      dev.Number             = PLUGIN_ID_104;
+      dev.Type               = DEVICE_TYPE_SPI;
+      dev.VType              = Sensor_VType::SENSOR_TYPE_NONE;
+      dev.ExitTaskBeforeSave = false;
       break;
     }
 

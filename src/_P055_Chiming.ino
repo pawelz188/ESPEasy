@@ -94,13 +94,14 @@ boolean Plugin_055(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number           = PLUGIN_ID_055;
-      Device[deviceCount].Type               = DEVICE_TYPE_TRIPLE;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_NONE;
-      Device[deviceCount].InverseLogicOption = true;
-      Device[deviceCount].setPin1Direction(gpio_direction::gpio_output);
-      Device[deviceCount].setPin2Direction(gpio_direction::gpio_output);
-      Device[deviceCount].setPin3Direction(gpio_direction::gpio_output);
+      auto& dev = Device[++deviceCount];
+      dev.Number             = PLUGIN_ID_055;
+      dev.Type               = DEVICE_TYPE_TRIPLE;
+      dev.VType              = Sensor_VType::SENSOR_TYPE_NONE;
+      dev.InverseLogicOption = true;
+      dev.setPin1Direction(gpio_direction::gpio_output);
+      dev.setPin2Direction(gpio_direction::gpio_output);
+      dev.setPin3Direction(gpio_direction::gpio_output);
       break;
     }
 

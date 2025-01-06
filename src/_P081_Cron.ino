@@ -28,15 +28,13 @@ boolean Plugin_081(uint8_t function, struct EventStruct *event, String& string)
     {
       // This case defines the device characteristics, edit appropriately
 
-      Device[++deviceCount].Number = PLUGIN_ID_081;
-      Device[deviceCount].Type     = DEVICE_TYPE_DUMMY;              // how the device is connected
-      Device[deviceCount].VType    = Sensor_VType::SENSOR_TYPE_NONE; // type of value the plugin will return, used only for
-                                                                     // Domoticz
-      Device[deviceCount].ValueCount = 2;                            // number of output variables. The value should match the number of
-                                                                     // keys
-                                                                     // PLUGIN_VALUENAME1_xxx
-      Device[deviceCount].DecimalsOnly     = true;
-      Device[deviceCount].HasFormatUserVar = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number           = PLUGIN_ID_081;
+      dev.Type             = DEVICE_TYPE_DUMMY;              // how the device is connected
+      dev.VType            = Sensor_VType::SENSOR_TYPE_NONE; // type of value the plugin will return, used only for Domoticz
+      dev.ValueCount       = 2;                              // number of output variables.
+      dev.DecimalsOnly     = true;
+      dev.HasFormatUserVar = true;
       break;
     }
 

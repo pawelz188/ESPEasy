@@ -34,16 +34,12 @@ boolean Plugin_111(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number           = PLUGIN_ID_111;
-      Device[deviceCount].Type               = DEVICE_TYPE_SPI2;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_ULONG;
-      Device[deviceCount].Ports              = 0;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].ValueCount         = 1;
-      Device[deviceCount].SendDataOption     = true;
-      Device[deviceCount].TimerOption        = false;
-      Device[deviceCount].GlobalSyncOption   = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_111;
+      dev.Type           = DEVICE_TYPE_SPI2;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_ULONG;
+      dev.ValueCount     = 1;
+      dev.SendDataOption = true;
       break;
     }
 
@@ -89,7 +85,7 @@ boolean Plugin_111(uint8_t function, struct EventStruct *event, String& string)
           F("Tag removal detection + Time-out")
           # endif // ifdef P111_USE_REMOVAL
         };
-        const int    removalopts[P111_removaltypes] = { // A-typical order for logical order and backward compatibility
+        const int removalopts[P111_removaltypes] = { // A-typical order for logical order and backward compatibility
           1, 0,
           # ifdef P111_USE_REMOVAL
           2

@@ -47,16 +47,17 @@ boolean                    Plugin_013(uint8_t function, struct EventStruct *even
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number       = PLUGIN_ID_013;
-      Device[deviceCount].Type           = DEVICE_TYPE_DUAL;
-      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_SINGLE;
-      Device[deviceCount].FormulaOption  = true;
-      Device[deviceCount].ValueCount     = 1;
-      Device[deviceCount].SendDataOption = true;
-      Device[deviceCount].TimerOption    = true;
-      Device[deviceCount].TimerOptional  = true;
-      Device[deviceCount].PluginStats    = true;
-      Device[deviceCount].setPin1Direction(gpio_direction::gpio_output);
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_013;
+      dev.Type           = DEVICE_TYPE_DUAL;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_SINGLE;
+      dev.FormulaOption  = true;
+      dev.ValueCount     = 1;
+      dev.SendDataOption = true;
+      dev.TimerOption    = true;
+      dev.TimerOptional  = true;
+      dev.PluginStats    = true;
+      dev.setPin1Direction(gpio_direction::gpio_output);
 
       break;
     }

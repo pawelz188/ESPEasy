@@ -29,16 +29,17 @@ boolean Plugin_024(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number       = PLUGIN_ID_024;
-      Device[deviceCount].Type           = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_SINGLE;
-      Device[deviceCount].Ports          = 16;
-      Device[deviceCount].FormulaOption  = true;
-      Device[deviceCount].SendDataOption = true;
-      Device[deviceCount].ValueCount     = 1;
-      Device[deviceCount].TimerOption    = true;
-      Device[deviceCount].PluginStats    = true;
-      Device[deviceCount].I2CMax100kHz   = true; // Max 100 kHz allowed/supported
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_024;
+      dev.Type           = DEVICE_TYPE_I2C;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_SINGLE;
+      dev.Ports          = 16;
+      dev.FormulaOption  = true;
+      dev.SendDataOption = true;
+      dev.ValueCount     = 1;
+      dev.TimerOption    = true;
+      dev.PluginStats    = true;
+      dev.I2CMax100kHz   = true; // Max 100 kHz allowed/supported
       break;
     }
 

@@ -36,13 +36,14 @@ boolean Plugin_080(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number       = PLUGIN_ID_080;
-      Device[deviceCount].Type           = DEVICE_TYPE_SINGLE;
-      Device[deviceCount].VType          = Sensor_VType::SENSOR_TYPE_QUAD;
-      Device[deviceCount].ValueCount     = 1;
-      Device[deviceCount].SendDataOption = true;
-      Device[deviceCount].TimerOption    = true;
-      Device[deviceCount].TimerOptional  = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number         = PLUGIN_ID_080;
+      dev.Type           = DEVICE_TYPE_SINGLE;
+      dev.VType          = Sensor_VType::SENSOR_TYPE_QUAD;
+      dev.ValueCount     = 1;
+      dev.SendDataOption = true;
+      dev.TimerOption    = true;
+      dev.TimerOptional  = true;
       break;
     }
 

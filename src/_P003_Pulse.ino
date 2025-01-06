@@ -53,17 +53,18 @@ boolean Plugin_003(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number         = PLUGIN_ID_003;
-      Device[deviceCount].Type             = DEVICE_TYPE_SINGLE;
-      Device[deviceCount].VType            = Sensor_VType::SENSOR_TYPE_SINGLE;
-      Device[deviceCount].PullUpOption     = true;
-      Device[deviceCount].FormulaOption    = true;
-      Device[deviceCount].ValueCount       = PLUGIN_NR_VALUENAMES_003;
-      Device[deviceCount].SendDataOption   = true;
-      Device[deviceCount].TimerOption      = true;
-      Device[deviceCount].TimerOptional    = true;
-      Device[deviceCount].PluginStats      = true;
-      Device[deviceCount].TaskLogsOwnPeaks = true;
+      auto& dev = Device[++deviceCount];
+      dev.Number           = PLUGIN_ID_003;
+      dev.Type             = DEVICE_TYPE_SINGLE;
+      dev.VType            = Sensor_VType::SENSOR_TYPE_SINGLE;
+      dev.PullUpOption     = true;
+      dev.FormulaOption    = true;
+      dev.ValueCount       = PLUGIN_NR_VALUENAMES_003;
+      dev.SendDataOption   = true;
+      dev.TimerOption      = true;
+      dev.TimerOptional    = true;
+      dev.PluginStats      = true;
+      dev.TaskLogsOwnPeaks = true;
       break;
     }
 

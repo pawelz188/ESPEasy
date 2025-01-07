@@ -73,24 +73,20 @@ boolean Plugin_111(uint8_t function, struct EventStruct *event, String& string)
       addFormSubHeader(F("Options"));
 
       {
-        # ifdef P111_USE_REMOVAL
-        #  define P111_removaltypes 3
-        # else // ifdef P111_USE_REMOVAL
-        #  define P111_removaltypes 2
-        # endif // ifdef P111_USE_REMOVAL
-        const __FlashStringHelper *removaltype[P111_removaltypes] = {
+        const __FlashStringHelper *removaltype[] = {
           F("None"),
           F("Autoremove after Time-out"),
           # ifdef P111_USE_REMOVAL
           F("Tag removal detection + Time-out")
           # endif // ifdef P111_USE_REMOVAL
         };
-        const int removalopts[P111_removaltypes] = { // A-typical order for logical order and backward compatibility
+        const int removalopts[] = { // A-typical order for logical order and backward compatibility
           1, 0,
           # ifdef P111_USE_REMOVAL
           2
           # endif // P111_USE_REMOVAL
         };
+        constexpr size_t P111_removaltypes = NR_ELEMENTS(removalopts);
         addFormSelector(F("Tag removal mode"), F("autotagremoval"), P111_removaltypes, removaltype, removalopts, P111_TAG_AUTOREMOVAL);
       }
 

@@ -125,8 +125,6 @@ boolean Plugin_122(uint8_t function, struct EventStruct *event, String& string)
       // The user's selection will be stored in
       // PCONFIG(x) (custom configuration)
 
-      # define P122_RESOLUTION_OPTIONS 4
-
       const __FlashStringHelper *options[] = {
         F("Temp 14 bits / RH 12 bits"),
         F("Temp 13 bits / RH 10 bits"),
@@ -139,7 +137,8 @@ boolean Plugin_122(uint8_t function, struct EventStruct *event, String& string)
         P122_RESOLUTION_12T_08RH,
         P122_RESOLUTION_11T_11RH,
       };
-      addFormSelector(F("Resolution"), P122_RESOLUTION_LABEL, P122_RESOLUTION_OPTIONS, options, optionValues, P122_RESOLUTION);
+      constexpr size_t optionCount = NR_ELEMENTS(optionValues);
+      addFormSelector(F("Resolution"), P122_RESOLUTION_LABEL, optionCount, options, optionValues, P122_RESOLUTION);
 
 # ifndef LIMIT_BUILD_SIZE
       P122_data_struct *P122_data = static_cast<P122_data_struct *>(getPluginTaskData(event->TaskIndex));
@@ -150,17 +149,18 @@ boolean Plugin_122(uint8_t function, struct EventStruct *event, String& string)
         uint32_t eidb;
         uint8_t  firmware;
         P122_data->getEID(eida, eidb, firmware);
-        String txt = F("CHIP ID:");
-        txt += formatToHex(eida);
-        txt += ',';
-        txt += formatToHex(eidb);
-        txt += F(" firmware=");
-        txt += String(firmware);
-#  ifdef PLUGIN_122_DEBUG
-        txt += F(" userReg= ");
-        txt += formatToHex(P122_data->getUserReg());
-#  endif // ifdef PLUGIN_122_DEBUG
-        addFormNote(txt);
+        addFormNote(strformat(F("CHIP ID:%s,%s firmware=%d"
+                              #  ifdef PLUGIN_122_DEBUG
+                                " userReg= %s"
+                              #  endif // ifdef PLUGIN_122_DEBUG
+                                ),
+                              formatToHex(eida).c_str(),
+                              formatToHex(eidb).c_str(),
+                              firmware
+                              #  ifdef PLUGIN_122_DEBUG
+                              , formatToHex(P122_data->getUserReg()).c_str()
+                              #  endif // ifdef PLUGIN_122_DEBUG
+                              ));
       }
 # endif // ifndef LIMIT_BUILD_SIZE
       success = true;

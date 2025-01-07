@@ -93,7 +93,8 @@ boolean Plugin_114(uint8_t function, struct EventStruct *event, String& string)
           P114_IT_400,
           P114_IT_800,
         };
-        addFormSelector(F("Integration Time"), F("it"), 5, optionsMode2, optionValuesMode2, PCONFIG(1));
+        constexpr size_t optionCount = NR_ELEMENTS(optionValuesMode2);
+        addFormSelector(F("Integration Time"), F("it"), optionCount, optionsMode2, optionValuesMode2, PCONFIG(1));
       }
 
       {
@@ -101,7 +102,8 @@ boolean Plugin_114(uint8_t function, struct EventStruct *event, String& string)
           F("Normal Dynamic"),
           F("High Dynamic") }
         ;
-        addFormSelector(F("Dynamic Setting"), F("hd"), 2, optionsMode3, nullptr, PCONFIG(2));
+        constexpr size_t optionCount = NR_ELEMENTS(optionsMode3);
+        addFormSelector(F("Dynamic Setting"), F("hd"), optionCount, optionsMode3, nullptr, PCONFIG(2));
       }
 
       success = true;
@@ -133,9 +135,9 @@ boolean Plugin_114(uint8_t function, struct EventStruct *event, String& string)
         return success;
       }
 
-      float UVA     = 0.0f;
-      float UVB     = 0.0f;
-      float UVIndex = 0.0f;
+      float UVA{};
+      float UVB{};
+      float UVIndex{};
 
       if (P114_data->read_sensor(UVA, UVB, UVIndex)) {
         UserVar.setFloat(event->TaskIndex, 0, UVA);

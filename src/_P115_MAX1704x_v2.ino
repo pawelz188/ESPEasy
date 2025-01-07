@@ -106,7 +106,8 @@ boolean Plugin_115(uint8_t function, struct EventStruct *event, String& string)
           MAX1704X_MAX17044,
           MAX1704X_MAX17048,
           MAX1704X_MAX17049 };
-        addFormSelector(F("Device"), F("device"), 4, options, optionValues, choice);
+        constexpr size_t optionCount = NR_ELEMENTS(optionValues);
+        addFormSelector(F("Device"), F("device"), optionCount, options, optionValues, choice);
       }
 
       addFormNumericBox(F("Alert threshold"), F("threshold"), P115_THRESHOLD, 1, 32);

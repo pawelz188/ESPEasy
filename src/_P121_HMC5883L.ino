@@ -22,9 +22,6 @@
  */
 
 # include "src/PluginStructs/P121_data_struct.h"
-# include <Adafruit_Sensor.h>
-# include <Adafruit_HMC5883_U.h>
-# include <math.h>
 
 # define PLUGIN_121
 # define PLUGIN_ID_121          121

@@ -15,6 +15,10 @@
 
 # define LU9685_OUTPUT_DISABLED    0xFF
 
+# define LU9685_ALL_PINS           0xFF
+
+# define LU9685_ALL_PIN_ENABLE_MASK    ((1 << LU9685_MAX_PINS) - 1)
+
 struct P178_data_struct : public PluginTaskData_base {
   P178_data_struct(uint8_t  address,
                    uint16_t freq);
@@ -23,19 +27,25 @@ struct P178_data_struct : public PluginTaskData_base {
 
   // When enabled, the pulse corresponding with the set angle will be output on the pin.
   // When disabled, the pin will be 'silent'
-  void enablePin(uint8_t pin,
+  bool enablePin(uint8_t pin,
                  bool    enable);
 
   // Set the servo on given pin to specified angle.
   // If angle is out of range, the pin will be disabled.
-  void setAngle(uint8_t pin,
+  bool setAngle(uint8_t pin,
                 int     angle);
 
   // Set enable mode explicitly
   // Angle will be constrained to the allowed range and stored internally
-  void setAngle(uint8_t pin,
+  bool setAngle(uint8_t pin,
                 int     angle,
                 bool    enable);
+
+  // Update pins using value stored in system variables [int#N] ... [int#N+nrPins-1]
+  // with nrPins <=0 update all pins from startPin ... lastPin
+  bool setRange(uint8_t  startPin,
+                uint32_t startVarIndex,
+                int      nrPins);
 
   // Write all set angles in a single I2C call
   bool   update();
@@ -46,6 +56,10 @@ struct P178_data_struct : public PluginTaskData_base {
   String logPrefix(const __FlashStringHelper *poststr);
 
 private:
+
+  void setAngle_internal(uint8_t pin,
+                         int     angle);
+
 
   uint8_t getAngle(uint8_t pin) const;
 

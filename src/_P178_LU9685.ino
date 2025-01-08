@@ -139,29 +139,57 @@ boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
 
       const String subcommand = parseString(string, 2);
 
+      // Command argument <pin> can either be 0 ... 19 or "all"
+      const bool allPins     = equals(parseString(string, 3), F("all"));
+      const uint8_t servoPin = allPins ? LU9685_ALL_PINS : event->Par2;
+
+      if (!allPins && (servoPin > LU9685_MAX_PINS)) {
+        addLog(LOG_LEVEL_ERROR, concat(P178_data->logPrefix(F("Incorrect pin: ")), servoPin));
+        break;
+      }
+
+
       // Command: lu9685,servo,<pin>,<angle>
       // Negative angle will disable pulse on pin
       if ((equals(subcommand, F("servo"))))
       {
-        success = true;
-        const uint32_t servoPin = event->Par2;
-        const int32_t  angle    = event->Par3;
-
-        if (servoPin > LU9685_MAX_PINS) {
-          addLog(LOG_LEVEL_ERROR, concat(P178_data->logPrefix(F("Incorrect pin: ")), servoPin));
-          success = false;
-        }
+        const int32_t angle = event->Par3;
 
         if (angle > LU9685_MAX_ANGLE) {
           addLog(LOG_LEVEL_ERROR, concat(P178_data->logPrefix(F("Incorrect angle: ")), angle));
-          success = false;
+          break;
         }
 
-        if (success) {
-          P178_data->setAngle(servoPin, angle, angle >= 0);
-        }
+        P178_data->setAngle(servoPin, angle, angle >= 0);
+        success = true;
         break;
       }
+
+      // Commands:
+      //  lu9685,enable,<pin>
+      //  lu9685,disable,<pin>
+      const bool subcommandEnable  = (equals(subcommand, F("enable")));
+      const bool subcommandDisable = (equals(subcommand, F("disable")));
+
+      if (subcommandEnable || subcommandDisable)
+      {
+        P178_data->enablePin(servoPin, subcommandEnable);
+        success = true;
+        break;
+      }
+
+
+      // Command:
+      //   lu9685,setrange,<startpin>,<startVarIndex>,<nrPins>
+      // Update pins using value stored in system variables [int#N] ... [int#N+nrPins-1]
+      if (equals(subcommand, F("setrange"))) {
+        const uint32_t startVarIndex = event->Par3;
+        const int nrPins             = event->Par4;
+
+        success = P178_data->setRange(servoPin, startVarIndex, nrPins);
+        break;
+      }
+
 
       break;
     }

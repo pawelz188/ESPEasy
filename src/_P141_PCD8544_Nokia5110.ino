@@ -147,9 +147,10 @@ boolean Plugin_141(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P141_CommandTrigger::pcd8544),
           static_cast<int>(P141_CommandTrigger::lcd),
         };
+        constexpr size_t optionCount = NR_ELEMENTS(commandTriggerOptions);
         addFormSelector(F("Write Command trigger"),
                         F("pcmdtrigger"),
-                        NR_ELEMENTS(commandTriggerOptions),
+                        optionCount,
                         commandTriggers,
                         commandTriggerOptions,
                         P141_CONFIG_FLAG_GET_CMD_TRIGGER);
@@ -222,13 +223,12 @@ boolean Plugin_141(uint8_t function, struct EventStruct *event, String& string)
       P141_CONFIG_FLAGS = lSettings;
 
       String strings[P141_Nlines];
-      String error;
 
       for (uint8_t varNr = 0; varNr < P141_Nlines; ++varNr) {
         strings[varNr] = web_server.arg(getPluginCustomArgName(varNr));
       }
 
-      error = SaveCustomTaskSettings(event->TaskIndex, strings, P141_Nlines, 0);
+      const String error = SaveCustomTaskSettings(event->TaskIndex, strings, P141_Nlines, 0);
 
       if (!error.isEmpty()) {
         addHtmlError(error);

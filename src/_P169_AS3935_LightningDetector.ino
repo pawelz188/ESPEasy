@@ -88,17 +88,18 @@ boolean Plugin_169(uint8_t function, struct EventStruct *event, String& string)
     case PLUGIN_I2C_HAS_ADDRESS:
     case PLUGIN_WEBFORM_SHOW_I2C_PARAMS:
     {
-      const uint8_t i2cAddressValues[] = { 0x01, 0x02, 0x03 };
+      constexpr uint8_t i2cAddressValues[] = { 0x01, 0x02, 0x03 };
+      constexpr size_t  i2cOptionCount     = NR_ELEMENTS(i2cAddressValues);
 
       if (function == PLUGIN_WEBFORM_SHOW_I2C_PARAMS)
       {
         // addFormSelectorI2C(P169_I2C_ADDRESS_LABEL, 3, i2cAddressValues, P169_I2C_ADDRESS);
-        addFormSelectorI2C(F("i2c_addr"), NR_ELEMENTS(i2cAddressValues), i2cAddressValues, P169_I2C_ADDRESS);
+        addFormSelectorI2C(F("i2c_addr"), i2cOptionCount, i2cAddressValues, P169_I2C_ADDRESS);
         addFormNote(F("Addr: 0-0-0-0-0-A1-A0. Both A0 & A1 low is not valid."));
       }
       else
       {
-        success = intArrayContains(NR_ELEMENTS(i2cAddressValues), i2cAddressValues, event->Par1);
+        success = intArrayContains(i2cOptionCount, i2cAddressValues, event->Par1);
       }
       break;
     }
@@ -125,9 +126,10 @@ boolean Plugin_169(uint8_t function, struct EventStruct *event, String& string)
           AS3935MI::AS3935_MNL_5,
           AS3935MI::AS3935_MNL_9,
           AS3935MI::AS3935_MNL_16 };
+        constexpr size_t optionCount = NR_ELEMENTS(optionValues);
         addFormSelector(F("Lightning Threshold"),
                         P169_LIGHTNING_THRESHOLD_LABEL,
-                        NR_ELEMENTS(optionValues),
+                        optionCount,
                         options,
                         optionValues,
                         P169_LIGHTNING_THRESHOLD);
@@ -156,8 +158,9 @@ boolean Plugin_169(uint8_t function, struct EventStruct *event, String& string)
           17,
           18
         };
-        addFormSelector(F("AFE Gain Min"), P169_AFE_GAIN_LOW_LABEL,  NR_ELEMENTS(optionValues), options, optionValues, P169_AFE_GAIN_LOW);
-        addFormSelector(F("AFE Gain Max"), P169_AFE_GAIN_HIGH_LABEL, NR_ELEMENTS(optionValues), options, optionValues, P169_AFE_GAIN_HIGH);
+        constexpr size_t optionCount = NR_ELEMENTS(optionValues);
+        addFormSelector(F("AFE Gain Min"), P169_AFE_GAIN_LOW_LABEL,  optionCount, options, optionValues, P169_AFE_GAIN_LOW);
+        addFormSelector(F("AFE Gain Max"), P169_AFE_GAIN_HIGH_LABEL, optionCount, options, optionValues, P169_AFE_GAIN_HIGH);
         addFormNote(F("Lower and upper limit for the Analog Frond-End auto gain to use."));
       }
 

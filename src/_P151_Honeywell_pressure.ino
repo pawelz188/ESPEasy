@@ -71,7 +71,7 @@ boolean Plugin_151(uint8_t function, struct EventStruct *event, String& string)
         0x88,
         0x98
       };
-      constexpr size_t addrCount = sizeof(i2cAddressValues) / sizeof(uint8_t);
+      constexpr size_t addrCount = NR_ELEMENTS(i2cAddressValues);
 
       if (function == PLUGIN_WEBFORM_SHOW_I2C_PARAMS) {
         addFormSelectorI2C(F("pi2c"), addrCount, i2cAddressValues, P151_I2C_ADDR);

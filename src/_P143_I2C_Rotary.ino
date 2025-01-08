@@ -171,9 +171,10 @@ boolean Plugin_143(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P143_DeviceType_e::DFRobotEncoder)
           # endif // if P143_FEATURE_INCLUDE_DFROBOT
         };
+        constexpr size_t optionCount = NR_ELEMENTS(selectModeValues);
         addFormSelector(F("Encoder type"),
                         F("pdevice"),
-                        sizeof(selectModeValues) / sizeof(int),
+                        optionCount,
                         selectModeOptions,
                         selectModeValues,
                         P143_ENCODER_TYPE,
@@ -239,9 +240,10 @@ boolean Plugin_143(uint8_t function, struct EventStruct *event, String& string)
               static_cast<int>(P143_M5StackLed_e::Led1Only),
               static_cast<int>(P143_M5StackLed_e::Led2Only),
             };
+            constexpr size_t optionCount = NR_ELEMENTS(selectLedModeValues);
             addFormSelector(F("Color map Leds"),
                             F("pledsel"),
-                            sizeof(selectLedModeValues) / sizeof(int),
+                            optionCount,
                             selectLedModeOptions,
                             selectLedModeValues,
                             P143_M5STACK_SELECTION);
@@ -284,9 +286,10 @@ boolean Plugin_143(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P143_ButtonAction_e::PushButtonInverted),
           static_cast<int>(P143_ButtonAction_e::ToggleSwitch),
         };
+        constexpr size_t optionCount = NR_ELEMENTS(selectButtonValues);
         addFormSelector(F("Button action"),
                         F("pbutton"),
-                        sizeof(selectButtonValues) / sizeof(int),
+                        optionCount,
                         selectButtonOptions,
                         selectButtonValues,
                         P143_PLUGIN_BUTTON_ACTION);
@@ -326,9 +329,10 @@ boolean Plugin_143(uint8_t function, struct EventStruct *event, String& string)
             static_cast<int>(P143_CounterMapping_e::ColorMapping),
             static_cast<int>(P143_CounterMapping_e::ColorGradient),
           };
+          constexpr size_t optionCount = NR_ELEMENTS(selectCounterValues);
           addFormSelector(F("Counter color mapping"),
                           F("pmap"),
-                          sizeof(selectCounterValues) / sizeof(int),
+                          optionCount,
                           selectCounterOptions,
                           selectCounterValues,
                           P143_PLUGIN_COUNTER_MAPPING);

@@ -144,12 +144,13 @@ boolean Plugin_138(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P138_valueOptions_e::ChargeLevel),
           static_cast<int>(P138_valueOptions_e::PowerSource),
         };
+        constexpr size_t optionCount = NR_ELEMENTS(valValues);
 
         for (uint8_t i = 0; i < P138_NR_OUTPUT_VALUES; i++) {
           sensorTypeHelper_loadOutputSelector(event,
                                               P138_CONFIG_BASE + i,
                                               i,
-                                              sizeof(valValues) / sizeof(int),
+                                              optionCount,
                                               valOptions,
                                               valValues);
         }

@@ -126,9 +126,10 @@ boolean Plugin_166(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(DFRobot_GP8403::eOutPutRange_t::eOutputRange5V),
           static_cast<int>(DFRobot_GP8403::eOutPutRange_t::eOutputRange10V),
         };
+        constexpr size_t optionCount = NR_ELEMENTS(configurationOptions);
         addFormSelector(F("Output range"),
                         F("range"),
-                        sizeof(configurationOptions) / sizeof(configurationOptions[0]),
+                        optionCount,
                         configurations,
                         configurationOptions,
                         P166_MAX_VOLTAGE);

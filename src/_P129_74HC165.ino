@@ -178,8 +178,14 @@ boolean Plugin_129(uint8_t function, struct EventStruct *event, String& string)
       const __FlashStringHelper *frequencyOptions[] = {
         F("10/sec (100 msec)"),
         F("50/sec (20 msec)") };
-      const int frequencyValues[] = { P129_FREQUENCY_10, P129_FREQUENCY_50 };
-      addFormSelector(F("Sample frequency"), F("frequency"), 2, frequencyOptions, frequencyValues, P129_CONFIG_FLAGS_GET_READ_FREQUENCY);
+      const int frequencyValues[]  = { P129_FREQUENCY_10, P129_FREQUENCY_50 };
+      constexpr size_t optionCount = NR_ELEMENTS(frequencyValues);
+      addFormSelector(F("Sample frequency"),
+                      F("frequency"),
+                      optionCount,
+                      frequencyOptions,
+                      frequencyValues,
+                      P129_CONFIG_FLAGS_GET_READ_FREQUENCY);
 
       addFormSubHeader(F("Display and output"));
 
@@ -191,8 +197,10 @@ boolean Plugin_129(uint8_t function, struct EventStruct *event, String& string)
         F("Decimal &amp; hex/bin"),
         F("Decimal only"),
         F("Hex/bin only") };
-      const int outputValues[] = { P129_OUTPUT_BOTH, P129_OUTPUT_DEC_ONLY, P129_OUTPUT_HEXBIN };
-      addFormSelector(F("Output selection"), F("outputsel"), 3, outputOptions, outputValues, P129_CONFIG_FLAGS_GET_OUTPUT_SELECTION);
+      const int outputValues[]     = { P129_OUTPUT_BOTH, P129_OUTPUT_DEC_ONLY, P129_OUTPUT_HEXBIN };
+      constexpr size_t outputCount = NR_ELEMENTS(outputValues);
+      addFormSelector(F("Output selection"), F("outputsel"), outputCount, outputOptions, outputValues,
+                      P129_CONFIG_FLAGS_GET_OUTPUT_SELECTION);
 
       addFormCheckBox(F("Separate events per pin"), F("separate_events"), P129_CONFIG_FLAGS_GET_SEPARATE_EVENTS == 1);
 
@@ -292,13 +300,10 @@ boolean Plugin_129(uint8_t function, struct EventStruct *event, String& string)
         # ifndef P129_DEBUG_LOG
 
         if (loglevelActiveFor(LOG_LEVEL_INFO) && ((i % 4 == 3) || (i == P129_CONFIG_CHIP_COUNT))) {
-          String log = F("74HC165 Writing to: ");
-          log += (i / 4);
-          log += F(", offset: ");
-          log += (off * 8);
-          log += F(", bits: ");
-          log += P129_ul2stringFixed(bits, BIN);
-          addLog(LOG_LEVEL_INFO, log);
+          addLog(LOG_LEVEL_INFO, strformat(F("74HC165 Writing to: %d, offset: %d, bits: %s"),
+                                           i / 4,
+                                           off * 8,
+                                           P129_ul2stringFixed(bits, BIN).c_str()));
         }
         # endif // ifndef P129_DEBUG_LOG
         off++;

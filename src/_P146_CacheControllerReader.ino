@@ -220,7 +220,8 @@ boolean Plugin_146(uint8_t function, struct EventStruct *event, String& string)
           ',',
           ';'
         };
-        addFormSelector(F("Separator"), F("separator"), 3, separatorLabels, separatorOptions, P146_SEPARATOR_CHARACTER);
+        constexpr size_t optionCount = NR_ELEMENTS(separatorOptions);
+        addFormSelector(F("Separator"), F("separator"), optionCount, separatorLabels, separatorOptions, P146_SEPARATOR_CHARACTER);
       }
       addFormCheckBox(F("Join Samples with same Timestamp"), F("jointimestamp"), P146_GET_JOIN_TIMESTAMP);
       addFormCheckBox(F("Export only enabled tasks"),        F("onlysettasks"),  P146_GET_ONLY_SET_TASKS);
@@ -268,13 +269,12 @@ boolean Plugin_146(uint8_t function, struct EventStruct *event, String& string)
       P146_SEPARATOR_CHARACTER = getFormItemInt(F("separator"));
 
       String strings[P146_Nlines];
-      String error;
 
       for (uint8_t varNr = 0; varNr < P146_Nlines; varNr++) {
         strings[varNr] = webArg(getPluginCustomArgName(varNr));
       }
 
-      error = SaveCustomTaskSettings(event->TaskIndex, strings, P146_Nlines, 0);
+      const String error = SaveCustomTaskSettings(event->TaskIndex, strings, P146_Nlines, 0);
 
       if (!error.isEmpty()) {
         addHtmlError(error);

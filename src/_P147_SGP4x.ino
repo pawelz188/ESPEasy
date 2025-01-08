@@ -118,7 +118,8 @@ boolean Plugin_147(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P147_sensor_e::SGP40),
           static_cast<int>(P147_sensor_e::SGP41),
         };
-        addFormSelector(F("Sensor model"), F("ptype"), 2, sensorTypes, sensorTypeOptions, P147_SENSOR_TYPE, true);
+        constexpr size_t optionCount = NR_ELEMENTS(sensorTypeOptions);
+        addFormSelector(F("Sensor model"), F("ptype"), optionCount, sensorTypes, sensorTypeOptions, P147_SENSOR_TYPE, true);
         # ifndef BUILD_NO_DEBUG
         addFormNote(F("Page will reload on change."));
         # endif // ifndef BUILD_NO_DEBUG
@@ -162,7 +163,7 @@ boolean Plugin_147(uint8_t function, struct EventStruct *event, String& string)
 
     case PLUGIN_WEBFORM_SAVE:
     {
-      int prevSensor = P147_SENSOR_TYPE;
+      const int prevSensor = P147_SENSOR_TYPE;
       P147_SENSOR_TYPE       = getFormItemInt(F("ptype"));
       P147_LOW_POWER_MEASURE = isFormItemChecked(F("plow")) ? 1 : 0;
       P147_SET_USE_COMPENSATION(getFormItemInt(F("comp")));

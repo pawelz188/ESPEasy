@@ -350,7 +350,7 @@ boolean Plugin_131(uint8_t function, struct EventStruct *event, String& string)
 
       error += SaveCustomTaskSettings(event->TaskIndex, strings, P131_Nlines, 0);
 
-      if (error.length() > 0) {
+      if (!error.isEmpty()) {
         addHtmlError(error);
       }
 

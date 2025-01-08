@@ -146,9 +146,10 @@ boolean Plugin_153(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P153_configuration_e::HighResolution20mW1000msec),
           static_cast<int>(P153_configuration_e::HighResolution20mW100msec),
         };
+        constexpr size_t optionCount = NR_ELEMENTS(configurationOptions);
         addFormSelector(F("Startup Configuration"),
                         F("startup"),
-                        sizeof(configurationOptions) / sizeof(configurationOptions[0]),
+                        optionCount,
                         configurations,
                         configurationOptions,
                         P153_STARTUP_CONFIGURATION);

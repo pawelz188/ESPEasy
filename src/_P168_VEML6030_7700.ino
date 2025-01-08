@@ -113,9 +113,10 @@ boolean Plugin_168(uint8_t function, struct EventStruct *event, String& string)
           VEML_LUX_NORMAL_NOWAIT,
           VEML_LUX_CORRECTED_NOWAIT,
         };
+        constexpr size_t optionCount = NR_ELEMENTS(readMethodOptions);
         addFormSelector(F("Lux Read-method"),
                         F("rmth"),
-                        NR_ELEMENTS(readMethodOptions),
+                        optionCount,
                         readMethod,
                         readMethodOptions,
                         P168_READLUX_MODE);
@@ -134,9 +135,10 @@ boolean Plugin_168(uint8_t function, struct EventStruct *event, String& string)
           0b10,
           0b11,
         };
+        constexpr size_t optionCount = NR_ELEMENTS(alsGainOptions);
         addFormSelector(F("Gain factor"),
                         F("gain"),
-                        NR_ELEMENTS(alsGainOptions),
+                        optionCount,
                         alsGain,
                         alsGainOptions,
                         P168_ALS_GAIN);
@@ -158,9 +160,10 @@ boolean Plugin_168(uint8_t function, struct EventStruct *event, String& string)
           0b0010,
           0b0011,
         };
+        constexpr size_t optionCount = NR_ELEMENTS(alsIntegrationOptions);
         addFormSelector(F("Integration time"),
                         F("int"),
-                        NR_ELEMENTS(alsIntegrationOptions),
+                        optionCount,
                         alsIntegration,
                         alsIntegrationOptions,
                         P168_ALS_INTEGRATION);
@@ -181,9 +184,10 @@ boolean Plugin_168(uint8_t function, struct EventStruct *event, String& string)
           static_cast<int>(P168_power_save_mode_e::Mode3),
           static_cast<int>(P168_power_save_mode_e::Mode4),
         };
+        constexpr size_t optionCount = NR_ELEMENTS(psmModeOptions);
         addFormSelector(F("Power Save Mode"),
                         F("psm"),
-                        NR_ELEMENTS(psmModeOptions),
+                        optionCount,
                         psmMode,
                         psmModeOptions,
                         P168_PSM_MODE);

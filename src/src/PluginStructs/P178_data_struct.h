@@ -6,7 +6,7 @@
 
 
 # define LU9685_ADDRESS            0x00 // I2C address
-# define LU9685_MAX_ADDRESS        0x3E
+# define LU9685_MAX_ADDRESS        0x1F
 # define LU9685_MAX_PINS           20
 # define LU9685_MAX_ANGLE          180
 # define LU9685_DEFAULT_FREQUENCY  50

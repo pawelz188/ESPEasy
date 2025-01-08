@@ -22,8 +22,13 @@
 boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
 {
   boolean  success = false;
-  int      address = P178_I2C_ADDR;
-  uint16_t freq    = P178_FREQ;
+  int      address = LU9685_ADDRESS;
+  uint16_t freq    = LU9685_DEFAULT_FREQUENCY;
+
+  if (event != nullptr) {
+    address = P178_I2C_ADDR;
+    freq    = P178_FREQ;
+  }
 
 
   if ((address < LU9685_ADDRESS) || (address > LU9685_MAX_ADDRESS)) {
@@ -92,7 +97,7 @@ boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
     case PLUGIN_WEBFORM_LOAD:
     {
       addFormNumericBox(
-        F("Frequency"),
+        F("PWM Frequency"),
         F("pfreq"),
         freq,
         LU9685_MIN_FREQUENCY,

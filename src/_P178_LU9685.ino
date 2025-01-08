@@ -141,7 +141,7 @@ boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
 
       // Command: lu9685,servo,<pin>,<angle>
       // Negative angle will disable pulse on pin
-      if ((equals(command, F("servo"))))
+      if ((equals(subcommand, F("servo"))))
       {
         success = true;
         const uint32_t servoPin = event->Par2;

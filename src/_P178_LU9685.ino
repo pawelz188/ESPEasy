@@ -153,7 +153,7 @@ boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
           addLog(LOG_LEVEL_ERROR, concat(P178_data->logPrefix(F("Incorrect angle: ")), angle));
           break;
         }
-        P178_data->setAngle(servoPin, angle);
+        P178_data->setAngle(servoPin, angle, angle >= 0);
         success = true;
         break;
       }

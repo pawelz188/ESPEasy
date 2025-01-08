@@ -39,17 +39,12 @@ boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
     {
-      Device[++deviceCount].Number           = PLUGIN_ID_178;
-      Device[deviceCount].Type               = DEVICE_TYPE_I2C;
-      Device[deviceCount].VType              = Sensor_VType::SENSOR_TYPE_NONE;
-      Device[deviceCount].Ports              = 1;
-      Device[deviceCount].PullUpOption       = false;
-      Device[deviceCount].InverseLogicOption = false;
-      Device[deviceCount].FormulaOption      = false;
-      Device[deviceCount].ValueCount         = 0;
-      Device[deviceCount].Custom             = true;
-      Device[deviceCount].TimerOption        = false;
-      Device[deviceCount].ExitTaskBeforeSave = false;
+      auto& dev = Device[++deviceCount];
+      dev.Number = PLUGIN_ID_178;
+      dev.Type   = DEVICE_TYPE_I2C;
+      dev.VType  = Sensor_VType::SENSOR_TYPE_NONE;
+      dev.Ports  = 1;
+      dev.Custom = true;
       break;
     }
 
@@ -138,23 +133,33 @@ boolean Plugin_178(uint8_t function, struct EventStruct *event, String& string)
       }
       const String command = parseString(string, 1);
 
-      // Command: lu9685servo,<pin>,<angle>
-      if ((equals(command, F("lu9685servo"))))
+      if (!(equals(command, F("lu9685")))) {
+        break;
+      }
+
+      const String subcommand = parseString(string, 2);
+
+      // Command: lu9685,servo,<pin>,<angle>
+      // Negative angle will disable pulse on pin
+      if ((equals(command, F("servo"))))
       {
-        const uint32_t servoPin = event->Par1;
-        const int32_t  angle    = event->Par2;
+        success = true;
+        const uint32_t servoPin = event->Par2;
+        const int32_t  angle    = event->Par3;
 
         if (servoPin > LU9685_MAX_PINS) {
           addLog(LOG_LEVEL_ERROR, concat(P178_data->logPrefix(F("Incorrect pin: ")), servoPin));
-          break;
+          success = false;
         }
 
         if (angle > LU9685_MAX_ANGLE) {
           addLog(LOG_LEVEL_ERROR, concat(P178_data->logPrefix(F("Incorrect angle: ")), angle));
-          break;
+          success = false;
         }
-        P178_data->setAngle(servoPin, angle, angle >= 0);
-        success = true;
+
+        if (success) {
+          P178_data->setAngle(servoPin, angle, angle >= 0);
+        }
         break;
       }
 

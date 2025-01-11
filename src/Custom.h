@@ -50,7 +50,7 @@
 // --- Wifi Client Mode -----------------------------------------------------------------------------
 #define DEFAULT_SSID                         "W7NET"            // Enter your network SSID
 #define DEFAULT_KEY                          "a0deadbeef0" // Enter your network WPA key
-#define DEFAULT_SSID2                        "TP_LINK_3285D7"                      // Enter your fallback network SSID
+#define DEFAULT_SSID2                        "Tendaw7"                      // Enter your fallback network SSID
 #define DEFAULT_KEY2                         "0deadbeef0"                      // Enter your fallback network WPA key
 #define DEFAULT_WIFI_INCLUDE_HIDDEN_SSID     false                   // Allow to connect to hidden SSID APs
 #define DEFAULT_USE_STATIC_IP                false                   // (true|false) enabled or disabled static IP
@@ -81,7 +81,7 @@
 #define DEFAULT_DONT_ALLOW_START_AP          false // Usually the AP will be started when no WiFi is defined, or the defined one cannot be found. This flag may prevent it.
 
 // --- Default Controller ------------------------------------------------------------------------------
-#define DEFAULT_CONTROLLER   false                                          // true or false enabled or disabled, set 1st controller
+#define DEFAULT_CONTROLLER   true                                          // true or false enabled or disabled, set 1st controller
                                                                             // defaults
 #define DEFAULT_CONTROLLER_ENABLED true                                     // Enable default controller by default
 #define DEFAULT_CONTROLLER_USER    ""                                       // Default controller user
@@ -95,7 +95,7 @@
 #define DEFAULT_SERVER_USEDNS false                                         // true: Use hostname.  false: use IP
 #define DEFAULT_USE_EXTD_CONTROLLER_CREDENTIALS   false                     // true: Allow longer user credentials for controllers
 
-#define DEFAULT_PORT        8080                                            // Enter your Server port value
+#define DEFAULT_PORT        1883                                            // Enter your Server port value
 #define DEFAULT_CONTROLLER_TIMEOUT  100                                     // Default timeout in msec
 
 #define DEFAULT_PROTOCOL    5                                              // PZ Protocol used for controller communications
@@ -176,7 +176,7 @@
 #define DEFAULT_FACTORY_RESET_KEEP_CONSOLE_LOG  true
 
 
-#define BUILD_NO_DEBUG
+//#define BUILD_NO_DEBUG
 
 // Custom built-in url for hosting JavaScript and CSS files.
 #define CUSTOM_BUILD_CDN_URL                   "https://cdn.jsdelivr.net/gh/letscontrolit/ESPEasy@mega/static/"
@@ -244,7 +244,9 @@
 // #define FEATURE_PUT_TO_HTTP 1 // Enable availability of the PutToHTTP command
 // #define FEATURE_I2C_DEVICE_CHECK 0 // Disable the I2C Device check feature
 // #define FEATURE_I2C_GET_ADDRESS 0 // Disable fetching the I2C address from I2C plugins. Will be enabled when FEATURE_I2C_DEVICE_CHECK is enabled
+#ifndef FLASH_1M
 #define FEATURE_RTTTL 1   // Enable rtttl command
+#endif
 // #define FEATURE_ANYRTTTL_LIB 1 // Use AnyRttl library for RTTTL handling
 // #define FEATURE_ANYRTTTL_ASYNC 1 // When AnyRttl enabled, use Async (nonblocking) mode instead of the default Blocking mode
 // #define FEATURE_RTTTL_EVENTS   1 // Enable RTTTL events for Async use, for blocking it doesn't make sense
@@ -303,7 +305,7 @@
 
 #define SETUP_PAGE_SHOW_CONFIG_BUTTON    true
 
-// #define FEATURE_AUTO_DARK_MODE           0                // 0 = Disable auto-dark mode
+#define FEATURE_AUTO_DARK_MODE           1                // 0 = Disable auto-dark mode
 // #define FEATURE_EXTENDED_TASK_VALUE_TYPES 0               // 0 = Disable extra task value types like 64 bit ints, double, etc. in Dummy tasks
 // #define FEATURE_USE_DOUBLE_AS_ESPEASY_RULES_FLOAT_TYPE 0  // 0 = switch to float as floating point type for rules/formula processing.
 
